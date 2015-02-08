@@ -60,5 +60,14 @@ void loop(){
 	
 	// 100% duty cycle, full speed forward
 	sendMultiplePWMCycles(num_cycles, 100);
+	
+	// 75% duty cycle, half speed forward
+	sendMultiplePWMCycles(num_cycles, 75);
+	
+	// 50% duty cycle, no movement
+	sendMultiplePWMCycles(num_cycles, 50);
+	
+	// 25% duty cycle, half speed reverse
+	sendMultiplePWMCycles(num_cycles, 25);
 
 }

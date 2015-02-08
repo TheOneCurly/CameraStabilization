@@ -17,24 +17,36 @@ void setup(){
 
 void loop(){
 	
-	Serial.print("Running at 0%");
+	Serial.println("Running at 0% duty cycle, full speed reverse");
 	analogWrite(PWM_output_pin, 0);
 	delay(5000); // 5 seconds
 	
-	Serial.print("Running at 25%");
+	Serial.println("Running at 25% duty cycle, half speed reverse");
 	analogWrite(PWM_output_pin, 64);
 	delay(5000); // 5 seconds
 	
-	Serial.print("Running at 50%");
+	Serial.println("Running at 50% duty cycle, idle");
 	analogWrite(PWM_output_pin, 127);
 	delay(5000); // 5 seconds
 	
-	Serial.print("Running at 75%");
+	Serial.println("Running at 75% duty cycle, half speed forward");
 	analogWrite(PWM_output_pin, 191);
 	delay(5000); // 5 seconds
 	
-	Serial.print("Running at 100%");
+	Serial.println("Running at 100% duty cycle, full speed forward");
 	analogWrite(PWM_output_pin, 255);
+	delay(5000); // 5 seconds
+	
+	Serial.println("Running at 75% duty cycle, half speed forward");
+	analogWrite(PWM_output_pin, 191);
+	delay(5000); // 5 seconds
+	
+	Serial.println("Running at 50% duty cycle, idle");
+	analogWrite(PWM_output_pin, 127);
+	delay(5000); // 5 seconds
+	
+	Serial.println("Running at 25% duty cycle, half speed reverse");
+	analogWrite(PWM_output_pin, 64);
 	delay(5000); // 5 seconds
 	
 }
