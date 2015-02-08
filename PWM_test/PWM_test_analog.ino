@@ -19,17 +19,22 @@ void loop(){
 	
 	Serial.print("Running at 0%");
 	analogWrite(PWM_output_pin, 0);
+	delay(5000); // 5 seconds
 	
 	Serial.print("Running at 25%");
 	analogWrite(PWM_output_pin, 64);
+	delay(5000); // 5 seconds
 	
 	Serial.print("Running at 50%");
 	analogWrite(PWM_output_pin, 127);
+	delay(5000); // 5 seconds
 	
 	Serial.print("Running at 75%");
 	analogWrite(PWM_output_pin, 191);
+	delay(5000); // 5 seconds
 	
 	Serial.print("Running at 100%");
 	analogWrite(PWM_output_pin, 255);
+	delay(5000); // 5 seconds
 	
 }
