@@ -39,7 +39,7 @@ void sendMultiplePWMCycles( int num_cycles, int duty_cycle_percentage){
 	Serial.println(" cycles.");
 	
 	for( int x1 = 0; x1 < num_cycles; x1++ ){
-		sendPWMCycle(duty_cycle_percentage);
+		sendSinglePWMCycle(duty_cycle_percentage);
 	}
 }
 
