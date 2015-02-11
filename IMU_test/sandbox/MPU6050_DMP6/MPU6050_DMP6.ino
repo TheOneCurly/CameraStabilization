@@ -90,7 +90,7 @@ MPU6050 mpu;
 // from the FIFO. Note this also requires gravity vector calculations.
 // Also note that yaw/pitch/roll angles suffer from gimbal lock (for
 // more info, see: http://en.wikipedia.org/wiki/Gimbal_lock)
-#define OUTPUT_READABLE_YAWPITCHROLL
+// #define OUTPUT_READABLE_YAWPITCHROLL
 
 // MPU control/status vars
 bool dmpReady = false;  // set true if DMP init was successful
@@ -105,6 +105,10 @@ Quaternion q;           // [w, x, y, z]         quaternion container
 VectorFloat gravity;    // [x, y, z]            gravity vector
 float euler[3];         // [psi, theta, phi]    Euler angle container
 float ypr[3];           // [yaw, pitch, roll]   yaw/pitch/roll container and gravity vector
+
+float euler_avg[3];
+float euler_count = 0;
+
 
 // ================================================================
 // ===               INTERRUPT DETECTION ROUTINE                ===
@@ -245,12 +249,23 @@ void loop() {
             // display Euler angles in degrees
             mpu.dmpGetQuaternion(&q, fifoBuffer);
             mpu.dmpGetEuler(euler, &q);
-            Serial.print("euler\t");
-            Serial.print(euler[0] * 180/M_PI);
-            Serial.print("\t");
-            Serial.print(euler[1] * 180/M_PI);
-            Serial.print("\t");
-            Serial.println(euler[2] * 180/M_PI);
+            if(euler_count < 10) {
+              euler_avg[0] += euler[0];
+              euler_avg[1] += euler[1];
+              euler_avg[2] += euler[2];
+              euler_count ++;
+            } else {
+              Serial.print("euler\t");
+              Serial.print(euler_avg[0] * 18/M_PI);
+              Serial.print("\t");
+              Serial.print(euler_avg[1] * 18/M_PI);
+              Serial.print("\t");
+              Serial.println(euler_avg[2] * 18/M_PI);
+              euler_count = 0;
+              euler_avg[0] = 0;
+              euler_avg[1] = 0;
+              euler_avg[2] = 0;
+            }
         #endif
 
         #ifdef OUTPUT_READABLE_YAWPITCHROLL
