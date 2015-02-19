@@ -90,7 +90,7 @@ MPU6050 mpu;
 // from the FIFO. Note this also requires gravity vector calculations.
 // Also note that yaw/pitch/roll angles suffer from gimbal lock (for
 // more info, see: http://en.wikipedia.org/wiki/Gimbal_lock)
-// #define OUTPUT_READABLE_YAWPITCHROLL
+#define OUTPUT_READABLE_YAWPITCHROLL
 
 // MPU control/status vars
 bool dmpReady = false;  // set true if DMP init was successful
@@ -108,6 +108,9 @@ float ypr[3];           // [yaw, pitch, roll]   yaw/pitch/roll container and gra
 
 float euler_avg[3];
 float euler_count = 0;
+
+float ypr_avg[3];
+float ypr_count = 0;
 
 
 // ================================================================
@@ -205,80 +208,80 @@ void setup() {
 void loop() {
     // if programming failed, don't try to do anything
     if (!dmpReady) return;
-
-    // wait for MPU interrupt or extra packet(s) available
-    while (!mpuInterrupt && fifoCount < packetSize) {
-        // other program behavior stuff here
-        // .
-        // .
-        // .
-        // if you are really paranoid you can frequently test in between other
-        // stuff to see if mpuInterrupt is true, and if so, "break;" from the
-        // while() loop to immediately process the MPU data
-        // .
-        // .
-        // .
-    }
-
-    // reset interrupt flag and get INT_STATUS byte
-    mpuInterrupt = false;
-    mpuIntStatus = mpu.getIntStatus();
-
-    // get current FIFO count
-    fifoCount = mpu.getFIFOCount();
-
-    // check for overflow (this should never happen unless our code is too inefficient)
-    if ((mpuIntStatus & 0x10) || fifoCount == 1024) {
-        // reset so we can continue cleanly
-        mpu.resetFIFO();
-        Serial.println(F("FIFO overflow!"));
-
-    // otherwise, check for DMP data ready interrupt (this should happen frequently)
-    } else if (mpuIntStatus & 0x02) {
-        // wait for correct available data length, should be a VERY short wait
-        while (fifoCount < packetSize) fifoCount = mpu.getFIFOCount();
-
-        // read a packet from FIFO
-        mpu.getFIFOBytes(fifoBuffer, packetSize);
-        
-        // track FIFO count here in case there is > 1 packet available
-        // (this lets us immediately read more without waiting for an interrupt)
-        fifoCount -= packetSize;
-
-        #ifdef OUTPUT_READABLE_EULER
-            // display Euler angles in degrees
-            mpu.dmpGetQuaternion(&q, fifoBuffer);
-            mpu.dmpGetEuler(euler, &q);
-            if(euler_count < 10) {
-              euler_avg[0] += euler[0];
-              euler_avg[1] += euler[1];
-              euler_avg[2] += euler[2];
-              euler_count ++;
-            } else {
-              Serial.print("euler\t");
-              Serial.print(euler_avg[0] * 18/M_PI);
-              Serial.print("\t");
-              Serial.print(euler_avg[1] * 18/M_PI);
-              Serial.print("\t");
-              Serial.println(euler_avg[2] * 18/M_PI);
-              euler_count = 0;
-              euler_avg[0] = 0;
-              euler_avg[1] = 0;
-              euler_avg[2] = 0;
-            }
-        #endif
-
-        #ifdef OUTPUT_READABLE_YAWPITCHROLL
-            // display Euler angles in degrees
-            mpu.dmpGetQuaternion(&q, fifoBuffer);
-            mpu.dmpGetGravity(&gravity, &q);
-            mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
-            Serial.print("ypr\t");
-            Serial.print(ypr[0] * 180/M_PI);
-            Serial.print("\t");
-            Serial.print(ypr[1] * 180/M_PI);
-            Serial.print("\t");
-            Serial.println(ypr[2] * 180/M_PI);
-        #endif
+    
+    if (mpuInterrupt || fifoCount >= packetSize){  
+      // reset interrupt flag and get INT_STATUS byte
+      mpuInterrupt = false;
+      mpuIntStatus = mpu.getIntStatus();
+  
+      // get current FIFO count
+      fifoCount = mpu.getFIFOCount();
+  
+      // check for overflow (this should never happen unless our code is too inefficient)
+      if ((mpuIntStatus & 0x10) || fifoCount == 1024) {
+          // reset so we can continue cleanly
+          mpu.resetFIFO();
+          Serial.println(F("FIFO overflow!"));
+  
+      // otherwise, check for DMP data ready interrupt (this should happen frequently)
+      } else if (mpuIntStatus & 0x02) {
+          // wait for correct available data length, should be a VERY short wait
+          while (fifoCount < packetSize) fifoCount = mpu.getFIFOCount();
+  
+          // read a packet from FIFO
+          mpu.getFIFOBytes(fifoBuffer, packetSize);
+          
+          // track FIFO count here in case there is > 1 packet available
+          // (this lets us immediately read more without waiting for an interrupt)
+          fifoCount -= packetSize;
+  
+          #ifdef OUTPUT_READABLE_EULER
+              // display Euler angles in degrees
+              mpu.dmpGetQuaternion(&q, fifoBuffer);
+              mpu.dmpGetEuler(euler, &q);
+              if(euler_count < 10) {
+                euler_avg[0] += euler[0];
+                euler_avg[1] += euler[1];
+                euler_avg[2] += euler[2];
+                euler_count ++;
+              } else {
+                Serial.print("euler\t");
+                Serial.print(euler_avg[0] * 18/M_PI);
+                Serial.print("\t");
+                Serial.print(euler_avg[1] * 18/M_PI);
+                Serial.print("\t");
+                Serial.println(euler_avg[2] * 18/M_PI);
+                euler_count = 0;
+                euler_avg[0] = 0;
+                euler_avg[1] = 0;
+                euler_avg[2] = 0;
+              }
+          #endif
+  
+          #ifdef OUTPUT_READABLE_YAWPITCHROLL
+              // display Euler angles in degrees
+              mpu.dmpGetQuaternion(&q, fifoBuffer);
+              mpu.dmpGetGravity(&gravity, &q);
+              mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
+              if (ypr_count < 10) {
+                ypr_avg[0] += ypr[0];
+                ypr_avg[1] += ypr[1];
+                ypr_avg[2] += ypr[2];
+                ypr_count ++;
+              }else{
+                Serial.print("ypr\t");
+                Serial.print(ypr_avg[0] * 18/M_PI);
+                Serial.print("\t");
+                Serial.print(ypr_avg[1] * 18/M_PI);
+                Serial.print("\t");
+                Serial.println(ypr_avg[2] * 18/M_PI);
+                ypr_count = 0;
+                ypr_avg[0] = 0;
+                ypr_avg[1] = 0;
+                ypr_avg[2] = 0;
+              }
+          #endif
+      }
     }
 }
+
