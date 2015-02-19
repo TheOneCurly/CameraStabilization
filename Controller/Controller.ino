@@ -41,6 +41,11 @@ THE SOFTWARE.
 ===============================================
 */
 
+// declare PWM pins
+const int PWM_pin_x = 11;
+const int PWM_pin_y = 3;
+const int PWM_pin_z = 5;
+
 // I2Cdev and MPU6050 must be installed as libraries, or else the .cpp/.h files
 // for both classes must be in the include path of your project
 #include "I2Cdev.h"
@@ -83,7 +88,7 @@ MPU6050 mpu;
 // (in degrees) calculated from the quaternions coming from the FIFO.
 // Note that Euler angles suffer from gimbal lock (for more info, see
 // http://en.wikipedia.org/wiki/Gimbal_lock)
-#define OUTPUT_READABLE_EULER
+//#define OUTPUT_READABLE_EULER
 
 // uncomment "OUTPUT_READABLE_YAWPITCHROLL" if you want to see the yaw/
 // pitch/roll angles (in degrees) calculated from the quaternions coming
@@ -112,6 +117,7 @@ float euler_count = 0;
 float ypr_avg[3];
 float ypr_count = 0;
 
+volatile int stopx, stopy, stopz;
 
 // ================================================================
 // ===               INTERRUPT DETECTION ROUTINE                ===
@@ -122,11 +128,57 @@ void dmpDataReady() {
     mpuInterrupt = true;
 }
 
+volatile int timerCnt = 0;
+//TC1 ch 0
+void TC3_Handler()
+{
+       TC_GetStatus(TC1, 0);
+       if (stopx != 0 && stopy != 0 && stopz != 0){
+           timerCnt ++;
+           
+           if (timerCnt >= stopx){
+               analogWrite(PWM_pin_x, 128); // Stop
+               stopx = 0;
+           }
+           
+           if (timerCnt >= stopy){
+               analogWrite(PWM_pin_y, 128); // Stop
+               stopy = 0;
+           }
+           
+           if (timerCnt >= stopz){
+               analogWrite(PWM_pin_z, 128); // Stop
+               stopz = 0;
+           }
+       }else{
+           timerCnt = 0;  
+       }
+}
 // ================================================================
 // ===                      INITIAL SETUP                       ===
 // ================================================================
 
+void startTimer(Tc *tc, uint32_t channel, IRQn_Type irq, uint32_t frequency) {
+       pmc_set_writeprotect(false);
+       pmc_enable_periph_clk((uint32_t)irq);
+       TC_Configure(tc, channel, TC_CMR_WAVE | TC_CMR_WAVSEL_UP_RC | TC_CMR_TCCLKS_TIMER_CLOCK4);
+       uint32_t rc = VARIANT_MCK/128/frequency; //128 because we selected TIMER_CLOCK4 above
+       TC_SetRA(tc, channel, rc/2); //50% high, 50% low
+       TC_SetRC(tc, channel, rc);
+       TC_Start(tc, channel);
+       tc->TC_CHANNEL[channel].TC_IER=TC_IER_CPCS;
+       tc->TC_CHANNEL[channel].TC_IDR=~TC_IER_CPCS;
+       NVIC_EnableIRQ(irq);
+}
+
 void setup() {
+    startTimer(TC1, 0, TC3_IRQn, 4); //TC1 channel 0, the IRQ for that channel and the desired frequency
+    
+    // initialize PWM pins
+    pinMode(PWM_pin_x, OUTPUT);
+    pinMode(PWM_pin_y, OUTPUT);
+    pinMode(PWM_pin_z, OUTPUT);
+    
     // join I2C bus (I2Cdev library doesn't do this automatically)
     #if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
         Wire.begin();
@@ -209,6 +261,8 @@ void loop() {
     // if programming failed, don't try to do anything
     if (!dmpReady) return;
     
+    digitalWrite(13, false);
+    
     if (mpuInterrupt || fifoCount >= packetSize){  
       // reset interrupt flag and get INT_STATUS byte
       mpuInterrupt = false;
@@ -255,6 +309,12 @@ void loop() {
                 euler_avg[0] = 0;
                 euler_avg[1] = 0;
                 euler_avg[2] = 0;
+                
+                /*
+                accept angle, adjust motor
+                analogWrite(PWM_output_pin, 191);
+	        delay(5000); // 5 seconds
+                */
               }
           #endif
   
@@ -272,13 +332,42 @@ void loop() {
                 Serial.print("ypr\t");
                 Serial.print(ypr_avg[0] * 18/M_PI);
                 Serial.print("\t");
-                Serial.print(ypr_avg[1] * 18/M_PI);
+                Serial.print(ypr_avg[2] * 18/M_PI);
                 Serial.print("\t");
-                Serial.println(ypr_avg[2] * 18/M_PI);
+                Serial.println(ypr_avg[1] * 18/M_PI);
                 ypr_count = 0;
                 ypr_avg[0] = 0;
                 ypr_avg[1] = 0;
                 ypr_avg[2] = 0;
+                
+                /*
+                accept angle, adjust motor
+                analogWrite(PWM_output_pin, 191);
+	        delay(5000); // 5 seconds
+                */
+                if (ypr_avg[0] < 0){
+                    analogWrite(PWM_pin_x, 255); // Full Forward
+                }else{
+                    analogWrite(PWM_pin_x, 0); // Full Reverse
+                }
+                
+                stopx = 10;
+                
+                if (ypr_avg[1] < 0){
+                    analogWrite(PWM_pin_y, 255); // Full Forward
+                }else{
+                    analogWrite(PWM_pin_y, 0); // Full Reverse
+                }
+                
+                stopx = 25;
+                
+                if (ypr_avg[2] < 0){
+                    analogWrite(PWM_pin_z, 255); // Full Forward
+                }else{
+                    analogWrite(PWM_pin_z, 0); // Full Reverse
+                }
+                
+                stopz = 3;
               }
           #endif
       }
