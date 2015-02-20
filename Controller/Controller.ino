@@ -138,16 +138,19 @@ void TC3_Handler()
            
            if (timerCnt >= stopx){
                analogWrite(PWM_pin_x, 128); // Stop
+               Serial.println("StopX");
                stopx = 0;
            }
            
            if (timerCnt >= stopy){
                analogWrite(PWM_pin_y, 128); // Stop
+               Serial.println("StopY");
                stopy = 0;
            }
            
            if (timerCnt >= stopz){
                analogWrite(PWM_pin_z, 128); // Stop
+               Serial.println("StopZ");
                stopz = 0;
            }
        }else{
@@ -335,39 +338,59 @@ void loop() {
                 Serial.print(ypr_avg[2] * 18/M_PI);
                 Serial.print("\t");
                 Serial.println(ypr_avg[1] * 18/M_PI);
+
+                ypr_avg[0] = ypr_avg[0] * 18/M_PI;
+                ypr_avg[1] = ypr_avg[1] * 18/M_PI;
+                ypr_avg[2] = ypr_avg[2] * 18/M_PI;
+                
+                
+                if (ypr_avg[0] < -10 || ypr_avg[0] > 10) {
+                    if (ypr_avg[0] < -10){
+                        analogWrite(PWM_pin_x, 255); // Full Forward
+                        Serial.println("StartX_Forward");
+                    }else if (ypr_avg[0] > 10){
+                        analogWrite(PWM_pin_x, 0); // Full Reverse
+                        Serial.println("StartX_Reverse");
+                    }
+                    stopx = 10;
+                }else{
+                    stopx = 0;
+                    Serial.println("StartX_Stop");
+                }
+                
+                if (ypr_avg[1] < -10 || ypr_avg[1] > 10) {
+                    if (ypr_avg[1] < -10){
+                        analogWrite(PWM_pin_y, 255); // Full Forward
+                        Serial.println("StartY_Forward");
+                    }else if (ypr_avg[1] > 10){
+                        analogWrite(PWM_pin_y, 0); // Full Reverse
+                        Serial.println("StartY_Reverse");
+                    }
+                    stopy = 10;
+                }else{
+                    stopy = 0;
+                    Serial.println("StartY_Stop");
+                }
+                
+                if (ypr_avg[2] < -10 || ypr_avg[2] > 10) {
+                    if (ypr_avg[2] < -10){
+                        analogWrite(PWM_pin_z, 255); // Full Forward
+                        Serial.println("StartZ_Forward");
+                    }else if (ypr_avg[2] > 10){
+                        analogWrite(PWM_pin_z, 0); // Full Reverse
+                        Serial.println("StartZ_Reverse");
+                    }
+                    stopz = 10;
+                }else{
+                    stopz = 0;
+                    Serial.println("StartZ_Stop");
+                }
+                
                 ypr_count = 0;
                 ypr_avg[0] = 0;
                 ypr_avg[1] = 0;
                 ypr_avg[2] = 0;
                 
-                /*
-                accept angle, adjust motor
-                analogWrite(PWM_output_pin, 191);
-	        delay(5000); // 5 seconds
-                */
-                if (ypr_avg[0] < 0){
-                    analogWrite(PWM_pin_x, 255); // Full Forward
-                }else{
-                    analogWrite(PWM_pin_x, 0); // Full Reverse
-                }
-                
-                stopx = 10;
-                
-                if (ypr_avg[1] < 0){
-                    analogWrite(PWM_pin_y, 255); // Full Forward
-                }else{
-                    analogWrite(PWM_pin_y, 0); // Full Reverse
-                }
-                
-                stopx = 25;
-                
-                if (ypr_avg[2] < 0){
-                    analogWrite(PWM_pin_z, 255); // Full Forward
-                }else{
-                    analogWrite(PWM_pin_z, 0); // Full Reverse
-                }
-                
-                stopz = 3;
               }
           #endif
       }

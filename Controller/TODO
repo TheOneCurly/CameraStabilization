@@ -1,0 +1,8 @@
+Adjust goal position
+Test interrupts working together (timer fucking with MCU)
+PID
+Hall Effect angle
+IMU Offsets
+Seperate main loop
+euler or ypr
+	remove ifdefs and other references
