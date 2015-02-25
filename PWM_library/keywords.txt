@@ -1,0 +1,4 @@
+customPWM	KEYWORD1
+customPWMinit	KEYWORD2
+duty	KEYWORD2
+setMotorDuty	KEYWORK2
