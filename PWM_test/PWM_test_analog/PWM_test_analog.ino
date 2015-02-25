@@ -4,7 +4,7 @@
 // Mitchell Cook
 
 // initialize pwm pin, using digital write this can be any digital out pin
-int PWM_output_pin = 11;
+int PWM_output_pin = 5;
 
 
 void setup(){
@@ -16,7 +16,6 @@ void setup(){
 }
 
 void loop(){
-	
 	Serial.println("Running at 0% duty cycle, full speed reverse");
 	analogWrite(PWM_output_pin, 0);
 	delay(5000); // 5 seconds
@@ -48,5 +47,6 @@ void loop(){
 	Serial.println("Running at 25% duty cycle, half speed reverse");
 	analogWrite(PWM_output_pin, 64);
 	delay(5000); // 5 seconds
+
 	
 }
