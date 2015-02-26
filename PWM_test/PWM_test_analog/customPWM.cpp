@@ -138,3 +138,4 @@ void customPWM::setMotorDuty(unsigned long dy)
   motorDuty = dy;
   duty(_lowFreq + (dy/3));
 }
+
