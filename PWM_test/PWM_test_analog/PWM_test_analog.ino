@@ -105,7 +105,7 @@ void loop(){
 //        }
 
           motorPin.duty(65);
-          delay(1000);
+          delay(100);
           
           
           
@@ -127,7 +127,7 @@ void loop(){
           Serial.println();
           
           motorPin.duty(50);
-          delay(7000);
+          delay(2000);
 	
 }
 
