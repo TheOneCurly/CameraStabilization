@@ -58,24 +58,32 @@ void setup()   {
   testdrawbitmap(logo16_glcd_bmp, LOGO16_GLCD_HEIGHT, LOGO16_GLCD_WIDTH);
 }
 
+void draw_menu(){
+	//based on current menu, current position, button pressed
+	//call to function pointer to one of the menu fns
+}
+
+//things to pass to these - current menu option, axis for axis specific menus
 void draw_home(){
 	glcd.clear();
 	//draw stuff
-	// HOME SCREEN
-	// SELECT A MENU:
-	// AXIS CONTROL
-	// SYSTEM INFO
+	//need highlighting/coloration to show current menu option
+	glcd.drawstring(0, 0, "HOME SCREEN");
+	glcd.drawstring(0, 1, "SELECT A MENU");
+	glcd.drawstring(0, 2, "AXIS CONTROL");
+	glcd.drawstring(0, 3, "SYSTEM INFO");
 	glcd.display();
 }
 
 void draw_sys(){
 	glcd.clear();
 	//draw stuff
-	// SYSTEM INFO
-	// BATTERY LEFT : 50%
-	// X STATUS: LOCKED 90 DEG.
-	// Y STATUS: UNLOCKED
-	// Z STATUS: UNLOCKED
+	//need highlighting/coloration to show current menu option
+	glcd.drawstring(0, 0, "SYSTEM INFO");
+	glcd.drawstring(1, 0, "BATTERY LEFT"); //needs value (ie 50%)
+	glcd.drawstring(2, 0, "X STATUS: "); //value (ie LOCKED, 90 DEG, or UNLOCKED)
+	glcd.drawstring(3, 0, "Y STATUS: "); //value
+	glcd.drawstring(4, 0, "Z STATUS: "); //value 
 	// IMU (running out of space here? resolution?)
 	glcd.display();
 }
@@ -83,40 +91,47 @@ void draw_sys(){
 void draw_axis_select(){
 	glcd.clear();
 	//draw stuff
-	// AXIS CONTROL
-	// SELECT AN AXIS:
-	// X (ypr)
-	// Y (ypr)
-	// Z (ypr)
+	//need highlighting/coloration to show current menu option
+	glcd.drawstring(0, 0, "AXIS SELECTION");
+	glcd.drawstring(0, 1, "SELECT AN AXIS");
+	glcd.drawstring(0, 2, "X ())"); //ypr value/reference
+	glcd.drawstring(0, 3, "Y ())"); //ypr value/reference
+	glcd.drawstring(0, 4, "Z ())"); //ypr value/reference
 	glcd.display();
 }
 
 void draw_axis_options(){
 	glcd.clear();
 	//draw stuff
-	// AXIS MENU
-	// SELECT AN OPTION:
-	// UNLOCK AXIS
-	// RESET AXIS TO NEUTRAL
-	// ADJUST AXIS AND LOCK
+	//need highlighting/coloration to show current menu option
+	glcd.drawstring(0, 0, "AXIS OPTIONS");
+	glcd.drawstring(0, 1, "SELECT AN OPTION:");
+	glcd.drawstring(0, 2, "UNLOCK AXIS");
+	glcd.drawstring(0, 3, "RESET AXIS TO NEUTRAL");
+	glcd.drawstring(0, 4, "ADJUST AXIS AND LOCK");
 	glcd.display();
 }
 
 void draw_axis_control(){
 	glcd.clear();
 	//draw stuff
-	// ADJUST/LOCK MENU
-	// USE CONTROL STICK
-	// TO ADJUST <NAME> MOTOR
-	// FWD TO ACCEPT CHANGE
-	// BCK TO REVERT CHANGE
-	// <SHOW ANGLE> DEG.
+	//need highlighting/coloration to show current menu option
+	glcd.drawstring(0, 0, "AXIS/LOCK MENU");
+	glcd.drawstring(0, 1, "USE CONTROL STICK");
+	glcd.drawstring(0, 2, "TO ADJUST <NAME> MOTOR"); //needs motor name/axis
+	glcd.drawstring(0, 3, "RESET AXIS TO NEUTRAL");
+	glcd.drawstring(0, 4, "ADJUST AXIS AND LOCK");
+	glcd.drawstring(0, 5, "FWD TO ACCEPT CHANGE");
+	glcd.drawstring(0, 6, "BCK TO REVERT CHANGE");
+	glcd.drawstring(0, 7, "<ANGLE> DEG."); //show angle 
 	glcd.display();
 }
 
 }
 void loop()                     
 {
+	// notes: screen size is about 8 lines x 21 characters
+	
 	//while not button pressed or stick used
 	//loop?
 	
