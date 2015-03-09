@@ -135,11 +135,11 @@ void loop()
 	//while not button pressed or stick used
 	//loop?
 	
-	//if stick used
+	//if stick used - acts as pot, analog read
 	//--take up/down input, adjust menu
 	//--redraw
 	
-	//if button pressed
+	//if button pressed - analog read button
 	//--find forward or back
 	//--find menu option
 	//--find any other input?
