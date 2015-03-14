@@ -4,9 +4,9 @@
  *
  *	Team: Marit Brocker, Mitch Cook, Alex Wilson, Caleb Disbrow
  *	Creation Date: 14 March 2015
- *	Project: RIT Senior Design 2014-2015 -- Camera Stabalization
+ *	Project: RIT Senior Design 2014-2015 -- Camera Stabilization
  *
- *	Description: Funtionality for the PID controller for a 3-axis camera stabalization system.
+ *	Description: Funtionality for the PID controller for a 3-axis camera stabilization system.
  *				 Includes code to adjust the speed and movement direction of 3-phase BLDC motors
  *				 based on the input from a 6050 MPU.
  *
@@ -21,6 +21,9 @@
 /***************** Macros (Inline Functions) Definitions *********************/
 /************************** Function Prototypes ******************************/
 /************************** Variable Definitions *****************************/
+//For each of the following enables:
+//	True means the axis is stabilized
+//	False means the axis is free floating. 
 static bool X_control_en = true;
 static bool Y_control_en = true;
 static bool Z_control_en = true;
@@ -29,7 +32,7 @@ static bool Z_control_en = true;
 /**
  *
  * Calculates the movement of each of the 3 three-phase BLDC motors as they 
- * stabalize the platform. Movement is based on a single 6050MPU IMU that 
+ * stabilize the platform. Movement is based on a single 6050MPU IMU that 
  * senses the user's movement. This process does not use any error correction. 
  *
  * @param	
@@ -47,7 +50,7 @@ int* PIDMovementCalc(){
 /*******************************************************************************
  *
  * Calculates the movement of each of the 3 three-phase BLDC motors as they 
- * stabalize the platform. Movement is based on a single 6050MPU IMU that 
+ * stabilize the platform. Movement is based on a single 6050MPU IMU that 
  * senses the user's movement. This process does use error correction.
  *
  * @param	
@@ -71,7 +74,7 @@ int* PIDMovementCalc_withError(){
 /*******************************************************************************
  *
  * Adjusts the amount of movement required on the output of the PID based on the
- * weight of the camera being stabalized. Less force is required for lighter cameras,
+ * weight of the camera being stabilized. Less force is required for lighter cameras,
  * and more force is required for heavier cameras
  *
  * @param	weight - the current weight of the item held by the system in ounces
@@ -106,7 +109,7 @@ static bool AdjustPower(int batteryCharge){
  * Adjusts the amount of movement based on the performance desired by the user,
  * which will allow the user to introduce their own level of 'shake' into the system.
  *
- * @param	adjustValue - 0-100 - percentage of stabalization to perform.
+ * @param	adjustValue - 0-100 - percentage of stabilization to perform.
  *
  * @return	Whether or not the performance adjustement was successful.
  *
@@ -119,7 +122,7 @@ static bool AdjustPerformance(int adjustValue){
 
 /******************************************************************************
  *
- * Stabalize the X Axis of the Gimbal
+ * stabilize the X Axis of the Gimbal
  *
  * @return	current state of holding - true is stablized, false is free movement.
  *
@@ -136,7 +139,7 @@ static bool holdXAxis(){
 
 /******************************************************************************
  *
- * Stabalize the Y Axis of the Gimbal
+ * stabilize the Y Axis of the Gimbal
  *
  * @return	current state of holding - true is stablized, false is free movement.
  *
@@ -153,7 +156,7 @@ static bool holdYAxis(){
 /******************************************************************************
 /**
  *
- * Stabalize the Z Axis of the Gimbal. 
+ * stabilize the Z Axis of the Gimbal. 
  *
  * @return	current state of holding - true is stablized, false is free movement.
  *
@@ -171,7 +174,7 @@ static bool holdZAxis(){
 /******************************************************************************
 
  *
- * Do not stabalize the X Axis, allow it to freely move with the user's movement.
+ * Do not stabilize the X Axis, allow it to freely move with the user's movement.
  *
  *
  * @return	current state of holding - true is stablized, false is free movement.
@@ -189,7 +192,7 @@ static bool freeXAxis(){
 
 /******************************************************************************
  *
- * Do not stabalize the Y Axis, allow it to freely move with the user's movement.
+ * Do not stabilize the Y Axis, allow it to freely move with the user's movement.
  *
  *
  * @return	current state of holding - true is stablized, false is free movement.
@@ -206,7 +209,7 @@ static bool freeYAxis(){
 
 /******************************************************************************
  *
- * Do not stabalize the Z Axis, allow it to freely move with the user's movement.
+ * Do not stabilize the Z Axis, allow it to freely move with the user's movement.
  *
  *
  * @return	current state of holding - true is stablized, false is free movement.

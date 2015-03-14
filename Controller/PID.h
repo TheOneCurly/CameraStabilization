@@ -3,9 +3,9 @@
 
 	Team: Marit Brocker, Mitch Cook, Alex Wilson, Caleb Disbrow
 	Creation Date: 14 March 2015
-	Project: RIT Senior Design 2014-2015 -- Camera Stabalization
+	Project: RIT Senior Design 2014-2015 -- Camera Stabilization
 
-	Description: Funtionality for the PID controller for a 3-axis camera stabalization system.
+	Description: Funtionality for the PID controller for a 3-axis camera stabilization system.
 				 Includes code to adjust the speed and movement direction of 3-phase BLDC motors
 				 based on the input from a 6050 MPU.
 
