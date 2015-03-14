@@ -1,5 +1,4 @@
 #include <U8glib.h>
-
 #include "U8glib.h"
 
 int ledPin =  13;    // LED connected to digital pin 13
@@ -19,6 +18,10 @@ U8GLIB_LM6059_2X u8g(21, 18, 46, 50, 48);
 #define GREEN_LED 49
 #define RED_LED 47
 
+// Define Joystick Pins
+#define JS_X A3
+#define JS_Y A4
+
 //Used to determine which page should be drawn
 uint8_t draw_state = 0;
 uint8_t button_toggle = 0;
@@ -27,7 +30,9 @@ uint8_t button_toggle = 0;
 #define MENU_HEIGHT 9
 
 // The setup() method runs once, when the sketch starts
-void setup()   {                
+void setup()   {      
+  Serial.begin(115200);
+
   //Initialize Colored Backlight
   pinMode(BACKLIGHT_LED, OUTPUT);
   pinMode(BLUE_LED, OUTPUT);
@@ -117,8 +122,7 @@ void draw(void) {
 
 
 void loop()                     
-{
-  
+{ 
     // picture loop  
   u8g.firstPage();  
   do {
@@ -131,7 +135,15 @@ void loop()
     draw_state = 0;
   
   // rebuild the picture after some delay
-  delay(2000);
+  Serial.println(analogRead(JS_X));
+  Serial.println(analogRead(JS_Y));
+  do{
+    delay(100);
+  } while( analogRead(JS_X) < 1000);
+  
+  do{
+    delay(100);
+  } while( analogRead(JS_Y) < 1000);
   
 	// notes: screen size is about 8 lines x 21 characters
 	//        need a way of signifying current axis
