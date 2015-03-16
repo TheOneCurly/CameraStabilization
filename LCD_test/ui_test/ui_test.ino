@@ -26,6 +26,8 @@ U8GLIB_LM6059_2X u8g(21, 18, 46, 50, 48);
 uint8_t draw_state = 0;
 uint8_t button_toggle = 0;
 
+int cur_menu_page, cur_menu_index = 0;
+
 #define MENU_INDENT 8
 #define MENU_HEIGHT 9
 
@@ -112,39 +114,53 @@ void draw_axis_control(){
 void draw(void) {
   u8g_prepare();
   switch(draw_state >> 3) {
-    case 0: draw_home(draw_state&7); break;
-    case 1: draw_sys(draw_state&7); break;
-    case 2: draw_axis_select(draw_state&7); break;
-    case 3: draw_axis_options(draw_state&7); break;
+    case 0: draw_home(cur_menu_index); break;
+    case 1: draw_sys(cur_menu_index); break;
+    case 2: draw_axis_select(cur_menu_index); break;
+    case 3: draw_axis_options(cur_menu_index); break;
     case 4: draw_axis_control(); break;
   }
 }
 
 
 void loop()                     
-{ 
-    // picture loop  
+{  
   u8g.firstPage();  
   do {
     draw();
   } while( u8g.nextPage() );
   
-  // increase the state
-  draw_state++;
-  if ( draw_state >= 5*8 )
-    draw_state = 0;
-  
-  // rebuild the picture after some delay
   Serial.println(analogRead(JS_X));
   Serial.println(analogRead(JS_Y));
-  do{
-    delay(100);
-  } while( analogRead(JS_X) < 1000);
   
-  do{
+  if(analogRead(JS_X) > 600){
+    draw_state++;
+    cur_menu_index = 0;
+    if ( draw_state >= 5*8 )
+      draw_state = 0;
+  }
+  else if(analogRead(JS_X) < 400){
+    draw_state--;
+    cur_menu_index = 0;
+    if ( draw_state >= 5*8 )
+      draw_state = 0;
+  }
+  else if(analogRead(JS_Y) < 400){
+    if(cur_menu_index < 5){
+      cur_menu_index++;
+    }
+    delay(200);
+  }
+  else if(analogRead(JS_Y) > 600){
+    if(cur_menu_index > 0){
+      cur_menu_index--;
+    }
+    delay(200);
+  }
+  else{
     delay(100);
-  } while( analogRead(JS_Y) < 1000);
-  
+  }
+   
 	// notes: screen size is about 8 lines x 21 characters
 	//        need a way of signifying current axis
 	
