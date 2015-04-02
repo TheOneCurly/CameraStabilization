@@ -1,6 +1,6 @@
 /*
  *
- *	PID.c
+ *	PID.cpp
  *
  *	Team: Marit Brocker, Mitch Cook, Alex Wilson, Caleb Disbrow
  *	Creation Date: 14 March 2015
