@@ -28,6 +28,10 @@ static bool X_control_en = true;
 static bool Y_control_en = true;
 static bool Z_control_en = true;
 
+static int system_weight = 800;
+static int system_power = 100;
+static int system_performance = 100;
+
 
 /**
  *
@@ -83,7 +87,7 @@ int* PIDMovementCalc_withError(){
  *
  ******************************************************************************/
 static bool AdjustWeight(int weight){
-
+	system_weight = weight;
 }
 
 
@@ -100,7 +104,7 @@ static bool AdjustWeight(int weight){
  *
  ******************************************************************************/
 static bool AdjustPower(int batteryCharge){
-
+	system_power = batteryCharge;
 }
 
 
@@ -116,7 +120,7 @@ static bool AdjustPower(int batteryCharge){
  *
  ******************************************************************************/
 static bool AdjustPerformance(int adjustValue){
-
+	system_performance = adjustValue;
 }
 
 
