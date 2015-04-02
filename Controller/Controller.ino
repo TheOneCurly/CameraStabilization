@@ -42,13 +42,17 @@ THE SOFTWARE.
 */
 
 // declare PWM pins
-const int PWM_pin_x = 11;
+const int PWM_pin_x = 34;
 const int PWM_pin_y = 3;
 const int PWM_pin_z = 5;
 
 // I2Cdev and MPU6050 must be installed as libraries, or else the .cpp/.h files
 // for both classes must be in the include path of your project
 #include "I2Cdev.h"
+
+#include "customPWM.h"
+bool isGood = customPWMinit(20000, 100);
+customPWM motorPin(PWM_pin_x);
 
 #include "MPU6050_6Axis_MotionApps20.h"
 //#include "MPU6050.h" // not necessary if using MotionApps include file
@@ -137,19 +141,19 @@ void TC3_Handler()
            timerCnt ++;
            
            if (timerCnt >= stopx){
-               analogWrite(PWM_pin_x, 128); // Stop
+               //analogWrite(PWM_pin_x, 128); // Stop
                Serial.println("StopX");
                stopx = 0;
            }
            
            if (timerCnt >= stopy){
-               analogWrite(PWM_pin_y, 128); // Stop
+               //analogWrite(PWM_pin_y, 128); // Stop
                Serial.println("StopY");
                stopy = 0;
            }
            
            if (timerCnt >= stopz){
-               analogWrite(PWM_pin_z, 128); // Stop
+               //analogWrite(PWM_pin_z, 128); // Stop
                Serial.println("StopZ");
                stopz = 0;
            }
@@ -178,9 +182,9 @@ void setup() {
     startTimer(TC1, 0, TC3_IRQn, 4); //TC1 channel 0, the IRQ for that channel and the desired frequency
     
     // initialize PWM pins
-    pinMode(PWM_pin_x, OUTPUT);
-    pinMode(PWM_pin_y, OUTPUT);
-    pinMode(PWM_pin_z, OUTPUT);
+    //pinMode(PWM_pin_x, OUTPUT);
+    //pinMode(PWM_pin_y, OUTPUT);
+    //pinMode(PWM_pin_z, OUTPUT);
     
     // join I2C bus (I2Cdev library doesn't do this automatically)
     #if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
@@ -346,15 +350,16 @@ void loop() {
                 
                 if (ypr_avg[0] < -10 || ypr_avg[0] > 10) {
                     if (ypr_avg[0] < -10){
-                        analogWrite(PWM_pin_x, 255); // Full Forward
+                        motorPin.duty(75); // Full Forward
                         Serial.println("StartX_Forward");
                     }else if (ypr_avg[0] > 10){
-                        analogWrite(PWM_pin_x, 0); // Full Reverse
+                        motorPin.duty(25); // Full Reverse
                         Serial.println("StartX_Reverse");
                     }
                     stopx = 10;
                 }else{
                     stopx = 0;
+                    motorPin.duty(50);
                     Serial.println("StartX_Stop");
                 }
                 
