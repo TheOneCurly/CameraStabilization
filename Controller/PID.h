@@ -19,8 +19,8 @@
     //Movement Calculation Functions 
 //TODO: highly likely that one of these control functions will be eliminated in the end, but may be useful 
 //      to have a backup function if the error feedback line breaks down. 
-    int* PIDMovementCalc();
-    int* PIDMovementCalc_withError();
+    int* PIDMovementCalc(float*);
+    int* PIDMovementCalc_withError(float*);
 
 
     //The following functions will affect the PID movement calculations as they will change
