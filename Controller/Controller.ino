@@ -41,10 +41,15 @@ THE SOFTWARE.
 ===============================================
 */
 
+#include "customPWM.h"
 // declare PWM pins
 const int PWM_pin_x = 34;
 const int PWM_pin_y = 3;
 const int PWM_pin_z = 5;
+bool isGood = customPWMinit(20000, 100);
+customPWM motorPin(PWM_pin_x);
+//y pin
+//z pin
 
 // Arduino Wire library is required if I2Cdev I2CDEV_ARDUINO_WIRE implementation
 // is used in I2Cdev.h
@@ -125,6 +130,14 @@ void setup() {
 // ================================================================
 
 void loop() {
-    imu.poll();
+    float* data;
+    data = imu.poll();
+    //get angles from poll
+    //send angles to pid
+    PIDMovementCalc(data);
+    //pid returns duty cycles
+    //set duty cycles
+    motorPin.duty(75);
+    //repeat
 }
 
