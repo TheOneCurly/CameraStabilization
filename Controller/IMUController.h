@@ -9,8 +9,20 @@
                         Provides initialization and polling.
 
 ============================================================================================ */
+#ifndef _IMU_CONTROL_H_
+#define _IMU_CONTROL_H_
 
-#ifndef _MPU_CONTROL_H_
-#define _MPU_CONTROL_H_
+//#include "MPU6050.h"
+#include "MPU6050_6Axis_MotionApps20.h"
 
-    static bool mpuInit();
+
+class IMUController{
+    public:
+        bool init();
+        int* poll();
+        MPU6050* getIMU();
+        
+    private:
+        MPU6050 mpu;
+};
+#endif /* _IMU_CONTROL_H_ */
