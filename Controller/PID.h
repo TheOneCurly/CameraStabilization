@@ -15,6 +15,7 @@
 #ifndef _PID_CONTROL_H_
 #define _PID_CONTROL_H_
 
+#include "Arduino.h"
 
     //Movement Calculation Functions 
 //TODO: highly likely that one of these control functions will be eliminated in the end, but may be useful 

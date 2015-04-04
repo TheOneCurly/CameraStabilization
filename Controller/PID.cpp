@@ -47,38 +47,29 @@ static int system_performance = 100;
  *
  ******************************************************************************/
 int* PIDMovementCalc(float* angles){
-    int* dutyCycles = malloc(3*sizeof(int));
+    int* dutyCycles = (int*)malloc(3*sizeof(int));
     
-    if(angle[0] > 10){
-        Serial.println("X - forward");
+    if(angles[0] > 10){
         dutyCycles[0] = 100;
-    }else if(angle[0] < 10){
-        Serial.println("X - backward");
+    }else if(angles[0] < 10){
         dutyCycles[0] = 0;   
     }else{
-        Serial.println("X - hold");
         dutyCycles[0] = 50;
     }
     
-    if(angle[1] > 10){
-        Serial.println("Y - forward");
+    if(angles[1] > 10){
         dutyCycles[1] = 100;
-    }else if(angle[1] < 10){
-        Serial.println("Y - backward");
+    }else if(angles[1] < 10){
         dutyCycles[1] = 0;   
     }else{
-        Serial.println("Y - hold");
         dutyCycles[1] = 50;
     }
     
-    if(angle[1] > 10){
-        Serial.println("Z - forward");
+    if(angles[1] > 10){
         dutyCycles[1] = 100;
-    }else if(angle[1] < 10){
-        Serial.println("Z - backward");
+    }else if(angles[1] < 10){
         dutyCycles[1] = 0;   
     }else{
-        Serial.println("Z - hold");
         dutyCycles[1] = 50;
     }
     
@@ -99,7 +90,7 @@ int* PIDMovementCalc(float* angles){
  *
  *
  ******************************************************************************/
-int* PIDMovementCalc_withError(float* angles){
+int* PIDMovementCalc_withError(float* angless){
 
 }
 

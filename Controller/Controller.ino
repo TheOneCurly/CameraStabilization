@@ -40,6 +40,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ===============================================
 */
+#include "PID.h"
 
 #include "customPWM.h"
 // declare PWM pins
@@ -61,6 +62,8 @@ customPWM motorPin(PWM_pin_x);
 IMUController imu;
 
 volatile int stopx, stopy, stopz;
+float* angles;
+int* duty;
 // ================================================================
 // ===               INTERRUPT DETECTION ROUTINE                ===
 // ================================================================
@@ -114,7 +117,6 @@ void startTimer(Tc *tc, uint32_t channel, IRQn_Type irq, uint32_t frequency) {
 void setup() {
     startTimer(TC1, 0, TC3_IRQn, 4); //TC1 channel 0, the IRQ for that channel and the desired frequency
     
-
     // initialize PWM pins
     //pinMode(PWM_pin_x, OUTPUT);
     //pinMode(PWM_pin_y, OUTPUT);
@@ -130,12 +132,16 @@ void setup() {
 // ================================================================
 
 void loop() {
-    float* data;
-    data = imu.poll();
     //get angles from poll
-    //send angles to pid
-    PIDMovementCalc(data);
+    angles = imu.poll();
+    Serial.println(angles[0]);
+    Serial.println(angles[1]);
+    Serial.println(angles[2]);
     //pid returns duty cycles
+    duty = PIDMovementCalc(angles);
+    Serial.println(duty[0]);
+    Serial.println(duty[1]);
+    Serial.println(duty[2]);
     //set duty cycles
     motorPin.duty(75);
     //repeat
