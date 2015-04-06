@@ -39,5 +39,8 @@
     static bool freeXAxis();
     static bool freeYAxis();
     static bool freeZAxis();
+    
+    void setBaseAngles(float*);
 
 #endif 
+

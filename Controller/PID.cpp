@@ -28,11 +28,15 @@ static bool X_control_en = true;
 static bool Y_control_en = true;
 static bool Z_control_en = true;
 
+float baseAngles[3];
+
 const int MOTOR_STOP_DUTY = 50;
 const int MOTOR_HALF_FWD_DUTY= 75;
 const int MOTOR_FULL_FWD_DUTY = 100;
 const int MOTOR_HALF_REV_DUTY = 25;
 const int MOTOR_FULL_REV_DUTY = 0;
+
+const int ANGLE_THRESHOLD = 10;
 
 static int system_weight = 800;
 static int system_power = 100;
@@ -55,25 +59,25 @@ static int system_performance = 100;
 int* PIDMovementCalc(float* angles){
     int* dutyCycles = (int*)malloc(3*sizeof(int));
     
-    if(angles[0] > 10){
+    if(angles[0] > baseAngles[0] + ANGLE_THRESHOLD){
         dutyCycles[0] = MOTOR_HALF_FWD_DUTY;
-    }else if(angles[0] < -10){
+    }else if(angles[0] < baseAngles[0] - ANGLE_THRESHOLD){
         dutyCycles[0] = MOTOR_HALF_REV_DUTY;   
     }else{
         dutyCycles[0] = MOTOR_STOP_DUTY;
     }
     
-    if(angles[1] > 10){
+    if(angles[1] > baseAngles[1] + ANGLE_THRESHOLD){
         dutyCycles[1] = MOTOR_HALF_FWD_DUTY;
-    }else if(angles[1] < -10){
+    }else if(angles[1] < baseAngles[1] - ANGLE_THRESHOLD){
         dutyCycles[1] = MOTOR_HALF_REV_DUTY;   
     }else{
         dutyCycles[1] = MOTOR_STOP_DUTY;
     }
     
-    if(angles[2] > 10){
+    if(angles[2] > baseAngles[2] + ANGLE_THRESHOLD){
         dutyCycles[2] = MOTOR_HALF_FWD_DUTY;
-    }else if(angles[2] < -10){
+    }else if(angles[2] < baseAngles[2] - ANGLE_THRESHOLD){
         dutyCycles[2] = MOTOR_HALF_REV_DUTY;   
     }else{
         dutyCycles[2] = MOTOR_STOP_DUTY;
@@ -257,4 +261,19 @@ static bool freeZAxis(){
 	Z_control_en = false;
 
 	return Z_control_en;
+}
+
+/******************************************************************************
+ *
+ * Set starting IMU values
+ *
+ *
+ * @return
+ *
+ *
+ ******************************************************************************/
+void setBaseAngles(float* base){
+    baseAngles[0] = base[0];
+    baseAngles[1] = base[1];
+    baseAngles[2] = base[2];
 }
