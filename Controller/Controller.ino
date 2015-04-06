@@ -62,8 +62,8 @@ customPWM motorPin(PWM_pin_x);
 IMUController imu;
 
 volatile int stopx, stopy, stopz;
-float* angles;
 int* duty;
+float* angle_values = (float*) malloc(3*sizeof(float));
 // ================================================================
 // ===               INTERRUPT DETECTION ROUTINE                ===
 // ================================================================
@@ -132,13 +132,15 @@ void setup() {
 // ================================================================
 
 void loop() {
+    bool angles_flag;
     //get angles from poll
-    angles = imu.poll();
-    Serial.println(angles[0]);
-    Serial.println(angles[1]);
-    Serial.println(angles[2]);
+    angles_flag = imu.poll(angle_values);
+    Serial.println(angles_flag);
+    Serial.println(angle_values[0]);
+    Serial.println(angle_values[1]);
+    Serial.println(angle_values[2]);
     //pid returns duty cycles
-    duty = PIDMovementCalc(angles);
+    duty = PIDMovementCalc(angle_values);
     Serial.println(duty[0]);
     Serial.println(duty[1]);
     Serial.println(duty[2]);

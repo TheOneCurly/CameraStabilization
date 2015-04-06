@@ -153,71 +153,71 @@ void dmpDataReady() {
 	#endif
 }
 
-float* IMUController::poll(){
-    float* angle_values = (float*) malloc(3*sizeof(float));
+bool IMUController::poll(float* angle_values){
+        
+    if (!dmpReady) return false;
     
-    if (!dmpReady) return angle_values;
+    //digitalWrite(13, false);  //uhh...?
+    for(int x = 0; x <10; x++){
+      if (mpuInterrupt || fifoCount >= packetSize){  
+        // reset interrupt flag and get INT_STATUS byte
+        mpuInterrupt = false;
+        mpuIntStatus = mpu.getIntStatus();
     
-    digitalWrite(13, false);
+        // get current FIFO count
+        fifoCount = mpu.getFIFOCount();
     
-    if (mpuInterrupt || fifoCount >= packetSize){  
-      // reset interrupt flag and get INT_STATUS byte
-      mpuInterrupt = false;
-      mpuIntStatus = mpu.getIntStatus();
-  
-      // get current FIFO count
-      fifoCount = mpu.getFIFOCount();
-  
-      // check for overflow (this should never happen unless our code is too inefficient)
-      if ((mpuIntStatus & 0x10) || fifoCount == 1024) {
-          // reset so we can continue cleanly
-          mpu.resetFIFO();
-          Serial.println(F("FIFO overflow!"));
-  
-      // otherwise, check for DMP data ready interrupt (this should happen frequently)
-      } else if (mpuIntStatus & 0x02) {
-          // wait for correct available data length, should be a VERY short wait
-          while (fifoCount < packetSize) fifoCount = mpu.getFIFOCount();
-  
-          // read a packet from FIFO
-          mpu.getFIFOBytes(fifoBuffer, packetSize);
-          
-          // track FIFO count here in case there is > 1 packet available
-          // (this lets us immediately read more without waiting for an interrupt)
-          fifoCount -= packetSize;
-          
-          // display Euler angles in degrees
-          mpu.dmpGetQuaternion(&q, fifoBuffer);
-          mpu.dmpGetGravity(&gravity, &q);
-          mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
-          if (ypr_count < 10) {
-            ypr_avg[0] += ypr[0];
-            ypr_avg[1] += ypr[1];
-            ypr_avg[2] += ypr[2];
-            ypr_count ++;
-          }else{
-            Serial.print("ypr\t");
-            Serial.print(ypr_avg[0] * 18/M_PI);
-            Serial.print("\t");
-            Serial.print(ypr_avg[2] * 18/M_PI);
-            Serial.print("\t");
-            Serial.println(ypr_avg[1] * 18/M_PI);
-
-            ypr_avg[0] = ypr_avg[0] * 18/M_PI;
-            ypr_avg[1] = ypr_avg[1] * 18/M_PI;
-            ypr_avg[2] = ypr_avg[2] * 18/M_PI;
+        // check for overflow (this should never happen unless our code is too inefficient)
+        if ((mpuIntStatus & 0x10) || fifoCount == 1024) {
+            // reset so we can continue cleanly
+            mpu.resetFIFO();
+            Serial.println(F("FIFO overflow!"));
+            return false;    
+        // otherwise, check for DMP data ready interrupt (this should happen frequently)
+        } else if (mpuIntStatus & 0x02) {
+            // wait for correct available data length, should be a VERY short wait
+            while (fifoCount < packetSize) fifoCount = mpu.getFIFOCount();
+    
+            // read a packet from FIFO
+            mpu.getFIFOBytes(fifoBuffer, packetSize);
             
-            angle_values[0] = ypr_avg[0];
-            angle_values[1] = ypr_avg[1];
-            angle_values[2] = ypr_avg[2];
-            ypr_count = 0;
-            ypr_avg[0] = 0;
-            ypr_avg[1] = 0;
-            ypr_avg[2] = 0;       
-            return angle_values;          
-          }
-      }
-    }    
+            // track FIFO count here in case there is > 1 packet available
+            // (this lets us immediately read more without waiting for an interrupt)
+            fifoCount -= packetSize;
+            
+            // display Euler angles in degrees
+            mpu.dmpGetQuaternion(&q, fifoBuffer);
+            mpu.dmpGetGravity(&gravity, &q);
+            mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
+            if (ypr_count < 10) {
+              ypr_avg[0] += ypr[0];
+              ypr_avg[1] += ypr[1];
+              ypr_avg[2] += ypr[2];
+              ypr_count ++;
+            }else{
+              Serial.print("ypr\t");
+              Serial.print(ypr_avg[0] * 18/M_PI);
+              Serial.print("\t");
+              Serial.print(ypr_avg[2] * 18/M_PI);
+              Serial.print("\t");
+              Serial.println(ypr_avg[1] * 18/M_PI);
+  
+              ypr_avg[0] = ypr_avg[0] * 18/M_PI;
+              ypr_avg[1] = ypr_avg[1] * 18/M_PI;
+              ypr_avg[2] = ypr_avg[2] * 18/M_PI;
+              
+              angle_values[0] = ypr_avg[0];
+              angle_values[1] = ypr_avg[1];
+              angle_values[2] = ypr_avg[2];
+              ypr_count = 0;
+              ypr_avg[0] = 0;
+              ypr_avg[1] = 0;
+              ypr_avg[2] = 0;       
+              return true;          
+            }
+        }
+      } 
+    }   
 }
 
 MPU6050* IMUController::getIMU(){

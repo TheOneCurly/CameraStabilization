@@ -19,7 +19,7 @@
 class IMUController{
     public:
         bool init();
-        float* poll();
+        bool poll(float*);
         MPU6050* getIMU();
         
     private:
