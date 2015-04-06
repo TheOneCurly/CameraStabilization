@@ -28,6 +28,12 @@ static bool X_control_en = true;
 static bool Y_control_en = true;
 static bool Z_control_en = true;
 
+const int MOTOR_STOP_DUTY = 50;
+const int MOTOR_HALF_FWD_DUTY= 75;
+const int MOTOR_FULL_FWD_DUTY = 100;
+const int MOTOR_HALF_REV_DUTY = 25;
+const int MOTOR_FULL_REV_DUTY = 0;
+
 static int system_weight = 800;
 static int system_power = 100;
 static int system_performance = 100;
@@ -50,27 +56,27 @@ int* PIDMovementCalc(float* angles){
     int* dutyCycles = (int*)malloc(3*sizeof(int));
     
     if(angles[0] > 10){
-        dutyCycles[0] = 100;
-    }else if(angles[0] < 10){
-        dutyCycles[0] = 0;   
+        dutyCycles[0] = MOTOR_HALF_FWD_DUTY;
+    }else if(angles[0] < -10){
+        dutyCycles[0] = MOTOR_HALF_REV_DUTY;   
     }else{
-        dutyCycles[0] = 50;
+        dutyCycles[0] = MOTOR_STOP_DUTY;
     }
     
     if(angles[1] > 10){
-        dutyCycles[1] = 100;
-    }else if(angles[1] < 10){
-        dutyCycles[1] = 0;   
+        dutyCycles[1] = MOTOR_HALF_FWD_DUTY;
+    }else if(angles[1] < -10){
+        dutyCycles[1] = MOTOR_HALF_REV_DUTY;   
     }else{
-        dutyCycles[1] = 50;
+        dutyCycles[1] = MOTOR_STOP_DUTY;
     }
     
-    if(angles[1] > 10){
-        dutyCycles[1] = 100;
-    }else if(angles[1] < 10){
-        dutyCycles[1] = 0;   
+    if(angles[2] > 10){
+        dutyCycles[2] = MOTOR_HALF_FWD_DUTY;
+    }else if(angles[2] < -10){
+        dutyCycles[2] = MOTOR_HALF_REV_DUTY;   
     }else{
-        dutyCycles[1] = 50;
+        dutyCycles[2] = MOTOR_STOP_DUTY;
     }
     
     return dutyCycles;

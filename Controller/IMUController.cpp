@@ -29,7 +29,7 @@ VectorFloat gravity;    // [x, y, z]            gravity vector
 float ypr[3];           // [yaw, pitch, roll]   yaw/pitch/roll container and gravity vector
 
 float ypr_avg[3];
-float ypr_count = 0;
+int ypr_count = 0;
 
 
 /***************************** ISR *********************************/
@@ -153,12 +153,12 @@ void dmpDataReady() {
 	#endif
 }
 
-bool IMUController::poll(float* angle_values){
-        
+bool IMUController::poll(float* angle_values){   
+    ypr_count = 0;
     if (!dmpReady) return false;
     
     //digitalWrite(13, false);  //uhh...?
-    for(int x = 0; x <10; x++){
+    while(ypr_count < 11){
       if (mpuInterrupt || fifoCount >= packetSize){  
         // reset interrupt flag and get INT_STATUS byte
         mpuInterrupt = false;
@@ -195,12 +195,14 @@ bool IMUController::poll(float* angle_values){
               ypr_avg[2] += ypr[2];
               ypr_count ++;
             }else{
-              Serial.print("ypr\t");
-              Serial.print(ypr_avg[0] * 18/M_PI);
-              Serial.print("\t");
-              Serial.print(ypr_avg[2] * 18/M_PI);
-              Serial.print("\t");
-              Serial.println(ypr_avg[1] * 18/M_PI);
+              #ifdef DEBUG
+                Serial.print("ypr\t");
+                Serial.print(ypr_avg[0] * 18/M_PI);
+                Serial.print("\t");
+                Serial.print(ypr_avg[2] * 18/M_PI);
+                Serial.print("\t");
+                Serial.println(ypr_avg[1] * 18/M_PI);
+              #endif
   
               ypr_avg[0] = ypr_avg[0] * 18/M_PI;
               ypr_avg[1] = ypr_avg[1] * 18/M_PI;
@@ -215,6 +217,9 @@ bool IMUController::poll(float* angle_values){
               ypr_avg[2] = 0;       
               return true;          
             }
+        }
+        else{
+          //Serial.println("bad int status");
         }
       } 
     }   

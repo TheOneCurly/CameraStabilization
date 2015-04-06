@@ -135,17 +135,18 @@ void loop() {
     bool angles_flag;
     //get angles from poll
     angles_flag = imu.poll(angle_values);
-    Serial.println(angles_flag);
-    Serial.println(angle_values[0]);
-    Serial.println(angle_values[1]);
-    Serial.println(angle_values[2]);
+//    Serial.println(angles_flag);
+//    Serial.println(angle_values[0]);
+//    Serial.println(angle_values[1]);
+//    Serial.println(angle_values[2]);
     //pid returns duty cycles
     duty = PIDMovementCalc(angle_values);
+    Serial.println("x axis duty cycle");
     Serial.println(duty[0]);
-    Serial.println(duty[1]);
-    Serial.println(duty[2]);
+//    Serial.println(duty[1]);
+//    Serial.println(duty[2]);
     //set duty cycles
-    motorPin.duty(75);
+    motorPin.duty(duty[0]);
     //repeat
 }
 
