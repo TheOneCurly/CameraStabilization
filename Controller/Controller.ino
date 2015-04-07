@@ -13,11 +13,18 @@
  
 #include "PID.h"
 #include "customPWM.h"
-// declare PWM pins
+// declare pins
 const int PWM_pin_x = 34;
+const int brake_x = 6;
+const int enable_x = 9;
+
 const int PWM_pin_y = 3;
+const int brake_y = 7;
+const int enable_y = 10;
+
 const int PWM_pin_z = 5;
-const float ANGLE_INIT_THRESHOLD = 0.2;
+const int brake_z = 8;
+const int enable_z = 11;
 
 bool isGood = customPWMinit(20000, 100);
 customPWM motorPin(PWM_pin_x);
@@ -32,35 +39,60 @@ customPWM motorPin(PWM_pin_x);
 
 #include "IMUController.h"
 IMUController imu(0);
+IMUController imu_error(1);
 
 int* duty;
 float* angle_values = (float*) malloc(3*sizeof(float));
-float* angle_values_init = (float*) malloc(3*sizeof(float));
 // ================================================================
 // ===               INTERRUPT DETECTION ROUTINE                ===
 // ================================================================
 //
+void dmp0DataReady() {
+    imu.mpuInterrupt = true;
+}
 
+void dmp1DataReady() {
+    imu_error.mpuInterrupt = true;
+}
 
 // ================================================================
 // ===                      INITIAL SETUP                       ===
 // ================================================================
 
 void setup() {
+    // Set pin modes
+    pinMode(brake_x, OUTPUT);
+    pinMode(brake_y, OUTPUT);
+    pinMode(brake_z, OUTPUT);
+    
+    pinMode(enable_x, OUTPUT);
+    pinMode(enable_y, OUTPUT);
+    pinMode(enable_z, OUTPUT);
+    
+    // Release brakes
+    digitalWrite(brake_x, HIGH);
+    digitalWrite(brake_y, HIGH);
+    digitalWrite(brake_z, HIGH);
+    
+    // Disable movement
+    digitalWrite(enable_x, LOW);
+    digitalWrite(enable_y, LOW);
+    digitalWrite(enable_z, LOW);
+    
+    attachInterrupt(0, dmp0DataReady, RISING);
+    attachInterrupt(1, dmp1DataReady, RISING);
+    
     // Set up IMU connection
     imu.init();
     
     // Grab initial values
-    if(imu.poll(angle_values))       
-        do{
-          angle_values_init[0] = angle_values[0];
-          angle_values_init[1] = angle_values[2];
-          angle_values_init[2] = angle_values[2];
-          imu.poll(angle_values);
-          Serial.println("init...");
-        }while(abs(angle_values[0] - angle_values_init[0])>ANGLE_INIT_THRESHOLD || abs(angle_values[1] - angle_values_init[1])>ANGLE_INIT_THRESHOLD || abs(angle_values[2] - angle_values_init[2])>ANGLE_INIT_THRESHOLD);
-        
+    if(imu.poll(angle_values))
         setBaseAngles(angle_values);
+        
+    // Enable movement
+    digitalWrite(enable_x, HIGH);
+    digitalWrite(enable_y, HIGH);
+    digitalWrite(enable_z, HIGH);
 }
 
 
@@ -79,11 +111,17 @@ void loop() {
 //    Serial.println(angle_values[2]);
     //pid returns duty cycles
     duty = PIDMovementCalc(angle_values);
-    Serial.print("x axis duty cycle: ");
+    Serial.println("x axis duty cycle");
     Serial.println(duty[0]);
 //    Serial.println(duty[1]);
 //    Serial.println(duty[2]);
+
     //set duty cycles
+    if(duty[0] == 50){
+        digitalWrite(brake_x, LOW);
+    }else{
+        digitalWrite(brake_x, HIGH);
+    }
     motorPin.duty(duty[0]);
     //repeat
 }

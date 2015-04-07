@@ -16,28 +16,9 @@
 #include "IMUController.h"
 
 /***************************** Variables *********************************/
-uint8_t devStatus;      // return status after each device operation (0 = success, !0 = error)
-uint8_t mpuIntStatus;   // holds actual interrupt status byte from MPU
-uint16_t packetSize;    // expected DMP packet size (default is 42 bytes)
-bool dmpReady = false;  // set true if DMP init was successful
-uint16_t fifoCount;     // count of all bytes currently in FIFO
-uint8_t fifoBuffer[64]; // FIFO storage buffer
-
-// orientation/motion vars
-Quaternion q;           // [w, x, y, z]         quaternion container
-VectorFloat gravity;    // [x, y, z]            gravity vector
-float ypr[3];           // [yaw, pitch, roll]   yaw/pitch/roll container and gravity vector
-
-float ypr_avg[3];
-int ypr_count = 0;
-
-MPU6050 mpu;
 
 /***************************** ISR *********************************/
-volatile bool mpuInterrupt = false;     // indicates whether MPU interrupt pin has gone high
-void dmpDataReady() {
-    mpuInterrupt = true;
-}
+
 
 /**
  *
@@ -50,7 +31,9 @@ void dmpDataReady() {
  *                False - Failure
  ******************************************************************************/
     IMUController::IMUController (int addr = 0){
+        interruptNum = 0;
         if(addr != 0){
+            interruptNum = 1;
             mpu = MPU6050(MPU6050_ADDRESS_AD0_HIGH);
         }
     }
@@ -108,7 +91,13 @@ void dmpDataReady() {
 
         // enable Arduino interrupt detection
         Serial.println(F("Enabling interrupt detection (Arduino external interrupt 0)..."));
-        attachInterrupt(0, dmpDataReady, RISING);
+        /*
+        if(interruptNum == 0){
+            attachInterrupt(0, dmp0DataReady, RISING);
+        }else{
+            attachInterrupt(1, dmp1DataReady, RISING);
+        }
+        */
         mpuIntStatus = mpu.getIntStatus();
 
         // set our DMP Ready flag so the main loop() function knows it's okay to use it
@@ -217,15 +206,16 @@ bool IMUController::poll(float* angle_values){
             }else{
               #ifdef DEBUG
                 Serial.print("ypr\t");
-                Serial.print(ypr_avg[0] * 180/(M_PI*ypr_count));
+                Serial.print(ypr_avg[0] * 18/M_PI);
                 Serial.print("\t");
-                Serial.print(ypr_avg[2] * 180/(M_PI*ypr_count));
+                Serial.print(ypr_avg[2] * 18/M_PI);
                 Serial.print("\t");
-                Serial.println(ypr_avg[1] * 180/(M_PI*ypr_count));
+                Serial.println(ypr_avg[1] * 18/M_PI);
               #endif
-              ypr_avg[0] = ypr_avg[0] * 180/(M_PI*ypr_count);
-              ypr_avg[1] = ypr_avg[1] * 180/(M_PI*ypr_count);
-              ypr_avg[2] = ypr_avg[2] * 180/(M_PI*ypr_count);
+  
+              ypr_avg[0] = ypr_avg[0] * 18/M_PI;
+              ypr_avg[1] = ypr_avg[1] * 18/M_PI;
+              ypr_avg[2] = ypr_avg[2] * 18/M_PI;
               
               angle_values[0] = ypr_avg[0];
               angle_values[1] = ypr_avg[1];
