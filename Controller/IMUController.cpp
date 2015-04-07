@@ -37,13 +37,12 @@ volatile bool mpuInterrupt = false;     // indicates whether MPU interrupt pin h
 void dmpDataReady() {
     mpuInterrupt = true;
 }
+
 /**
  *
- * Calculates the movement of each of the 3 three-phase BLDC motors as they 
- * stabilize the platform. Movement is based on a single 6050MPU IMU that 
- * senses the user's movement. This process does not use any error correction. 
+ * Creates a new MPU6050 object and initializes the I2C connection  
  *
- * @param	Pointer to MPU object, on failure may be null
+ * @param
  *
  * @return	Boolean indicating status of MPU connection. 
  *                True - success
@@ -58,10 +57,9 @@ void dmpDataReady() {
         Fastwire::setup(400, true);
     #endif
     
-    Serial.begin(115200);
-    
     #ifdef DEBUG
     // initialize serial communication
+    Serial.begin(115200);
     
     while (!Serial); // wait for Leonardo enumeration, others continue immediately
 
@@ -153,11 +151,22 @@ void dmpDataReady() {
 	#endif
 }
 
-bool IMUController::poll(float* angle_values){   
+/**
+ *
+ * Averages 10 values from the initialized IMU and places them in the
+ * provided float array.
+ *
+ * @param    3-length float array pointer for the output values
+ *
+ * @return	Boolean indicating success of data pull 
+ *                True - success
+ *                False - Failure
+ ******************************************************************************/
+bool IMUController::poll(float* angle_values){
     ypr_count = 0;
+    
     if (!dmpReady) return false;
     
-    //digitalWrite(13, false);  //uhh...?
     while(ypr_count < 11){
       if (mpuInterrupt || fifoCount >= packetSize){  
         // reset interrupt flag and get INT_STATUS byte
@@ -171,7 +180,11 @@ bool IMUController::poll(float* angle_values){
         if ((mpuIntStatus & 0x10) || fifoCount == 1024) {
             // reset so we can continue cleanly
             mpu.resetFIFO();
+            
+            #ifdef DEBUG
             Serial.println(F("FIFO overflow!"));
+            #endif
+            
             return false;    
         // otherwise, check for DMP data ready interrupt (this should happen frequently)
         } else if (mpuIntStatus & 0x02) {
@@ -228,3 +241,4 @@ bool IMUController::poll(float* angle_values){
 MPU6050* IMUController::getIMU(){
      return &mpu;   
 }
+
