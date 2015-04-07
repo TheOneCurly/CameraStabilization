@@ -31,6 +31,7 @@ float ypr[3];           // [yaw, pitch, roll]   yaw/pitch/roll container and gra
 float ypr_avg[3];
 int ypr_count = 0;
 
+MPU6050 mpu;
 
 /***************************** ISR *********************************/
 volatile bool mpuInterrupt = false;     // indicates whether MPU interrupt pin has gone high
@@ -48,6 +49,12 @@ void dmpDataReady() {
  *                True - success
  *                False - Failure
  ******************************************************************************/
+    IMUController::IMUController (int addr = 0){
+        if(addr != 0){
+            mpu = MPU6050(MPU6050_ADDRESS_AD0_HIGH);
+        }
+    }
+ 
  bool IMUController::init(){
         // join I2C bus (I2Cdev library doesn't do this automatically)
     #if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE

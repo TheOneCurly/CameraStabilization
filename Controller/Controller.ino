@@ -31,7 +31,7 @@ customPWM motorPin(PWM_pin_x);
 #endif
 
 #include "IMUController.h"
-IMUController imu;
+IMUController imu(0);
 
 int* duty;
 float* angle_values = (float*) malloc(3*sizeof(float));

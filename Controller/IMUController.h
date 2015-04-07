@@ -17,12 +17,12 @@
 
 class IMUController{
     public:
+        IMUController(int);
         bool init();
         bool poll(float*);
         MPU6050* getIMU();
         
     private:
-        MPU6050 mpu;
 };
 #endif /* _IMU_CONTROL_H_ */
 
