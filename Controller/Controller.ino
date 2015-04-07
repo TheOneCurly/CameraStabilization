@@ -17,6 +17,7 @@
 const int PWM_pin_x = 34;
 const int PWM_pin_y = 3;
 const int PWM_pin_z = 5;
+const float ANGLE_INIT_THRESHOLD = 0.2;
 
 bool isGood = customPWMinit(20000, 100);
 customPWM motorPin(PWM_pin_x);
@@ -34,6 +35,7 @@ IMUController imu;
 
 int* duty;
 float* angle_values = (float*) malloc(3*sizeof(float));
+float* angle_values_init = (float*) malloc(3*sizeof(float));
 // ================================================================
 // ===               INTERRUPT DETECTION ROUTINE                ===
 // ================================================================
@@ -49,7 +51,15 @@ void setup() {
     imu.init();
     
     // Grab initial values
-    if(imu.poll(angle_values))
+    if(imu.poll(angle_values))       
+        do{
+          angle_values_init[0] = angle_values[0];
+          angle_values_init[1] = angle_values[2];
+          angle_values_init[2] = angle_values[2];
+          imu.poll(angle_values);
+          Serial.println("init...");
+        }while(abs(angle_values[0] - angle_values_init[0])>ANGLE_INIT_THRESHOLD || abs(angle_values[1] - angle_values_init[1])>ANGLE_INIT_THRESHOLD || abs(angle_values[2] - angle_values_init[2])>ANGLE_INIT_THRESHOLD);
+        
         setBaseAngles(angle_values);
 }
 
@@ -69,7 +79,7 @@ void loop() {
 //    Serial.println(angle_values[2]);
     //pid returns duty cycles
     duty = PIDMovementCalc(angle_values);
-    Serial.println("x axis duty cycle");
+    Serial.print("x axis duty cycle: ");
     Serial.println(duty[0]);
 //    Serial.println(duty[1]);
 //    Serial.println(duty[2]);

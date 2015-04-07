@@ -276,4 +276,8 @@ void setBaseAngles(float* base){
     baseAngles[0] = base[0];
     baseAngles[1] = base[1];
     baseAngles[2] = base[2];
+    Serial.println("base angles");
+    Serial.println(baseAngles[0]);
+    Serial.println(baseAngles[1]);
+    Serial.println(baseAngles[2]);
 }

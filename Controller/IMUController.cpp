@@ -210,16 +210,15 @@ bool IMUController::poll(float* angle_values){
             }else{
               #ifdef DEBUG
                 Serial.print("ypr\t");
-                Serial.print(ypr_avg[0] * 18/M_PI);
+                Serial.print(ypr_avg[0] * 180/(M_PI*ypr_count));
                 Serial.print("\t");
-                Serial.print(ypr_avg[2] * 18/M_PI);
+                Serial.print(ypr_avg[2] * 180/(M_PI*ypr_count));
                 Serial.print("\t");
-                Serial.println(ypr_avg[1] * 18/M_PI);
+                Serial.println(ypr_avg[1] * 180/(M_PI*ypr_count));
               #endif
-  
-              ypr_avg[0] = ypr_avg[0] * 18/M_PI;
-              ypr_avg[1] = ypr_avg[1] * 18/M_PI;
-              ypr_avg[2] = ypr_avg[2] * 18/M_PI;
+              ypr_avg[0] = ypr_avg[0] * 180/(M_PI*ypr_count);
+              ypr_avg[1] = ypr_avg[1] * 180/(M_PI*ypr_count);
+              ypr_avg[2] = ypr_avg[2] * 180/(M_PI*ypr_count);
               
               angle_values[0] = ypr_avg[0];
               angle_values[1] = ypr_avg[1];
