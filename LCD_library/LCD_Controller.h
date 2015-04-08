@@ -105,6 +105,6 @@ void handle_select( int command );
 void unlock_axis( int axis );
 void reset_axis( int axis );
 
-
+void set_background_color(int color);
 
 #endif
