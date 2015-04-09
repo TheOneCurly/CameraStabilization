@@ -29,6 +29,7 @@ static bool Y_control_en = true;
 static bool Z_control_en = true;
 
 float baseAngles[3];
+float errorBaseAngles[3];
 
 const int MOTOR_STOP_DUTY = 50;
 const int MOTOR_HALF_FWD_DUTY= 75;
@@ -272,12 +273,18 @@ static bool freeZAxis(){
  *
  *
  ******************************************************************************/
-void setBaseAngles(float* base){
-    baseAngles[0] = base[0];
-    baseAngles[1] = base[1];
-    baseAngles[2] = base[2];
-    Serial.println("base angles");
-    Serial.println(baseAngles[0]);
-    Serial.println(baseAngles[1]);
-    Serial.println(baseAngles[2]);
+void setBaseAngles(float* base, int imu){
+    if(imu == 0){
+        baseAngles[0] = base[0];
+        baseAngles[1] = base[1];
+        baseAngles[2] = base[2];
+    }else if(imu == 1){
+        errorBaseAngles[0] = base[0];
+        errorBaseAngles[1] = base[1];
+        errorBaseAngles[2] = base[2];
+    }
+//    Serial.println("base angles");
+//    Serial.println(baseAngles[0]);
+//    Serial.println(baseAngles[1]);
+//    Serial.println(baseAngles[2]);
 }

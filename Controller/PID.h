@@ -40,7 +40,7 @@
     static bool freeYAxis();
     static bool freeZAxis();
     
-    void setBaseAngles(float*);
+    void setBaseAngles(float*, int);
 
 #endif 
 

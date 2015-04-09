@@ -27,9 +27,9 @@ const int brake_z = 8;
 const int enable_z = 11;
 
 bool isGood = customPWMinit(20000, 100);
-customPWM motorPin(PWM_pin_x);
-//y pin
-//z pin
+customPWM motorPinx(PWM_pin_x);
+customPWM motorPiny(PWM_pin_y);
+customPWM motorPinz(PWM_pin_z);
 
 // Arduino Wire library is required if I2Cdev I2CDEV_ARDUINO_WIRE implementation
 // is used in I2Cdev.h
@@ -43,6 +43,7 @@ IMUController imu_error(1);
 
 int* duty;
 float* angle_values = (float*) malloc(3*sizeof(float));
+float* error_angle_values = (float*) malloc(3*sizeof(float));
 // ================================================================
 // ===               INTERRUPT DETECTION ROUTINE                ===
 // ================================================================
@@ -85,10 +86,14 @@ void setup() {
     // Set up IMU connection
     imu.init();
     imu_error.init();
+
     
     // Grab initial values
-    if(imu.poll(angle_values))
-        setBaseAngles(angle_values);
+    while(!imu.poll(angle_values));
+    setBaseAngles(angle_values,0);
+    
+    while(!imu_error.poll(error_angle_values));
+    setBaseAngles(error_angle_values,1);
         
     // Enable movement
     digitalWrite(enable_x, HIGH);
@@ -105,26 +110,23 @@ void setup() {
 void loop() {
     bool angles_flag;
     //get angles from poll
-    imu_error.poll(angle_values);
+    imu_error.poll(error_angle_values);
     angles_flag = imu.poll(angle_values);
+        
+    Serial.println(" ");
 //    Serial.println(angles_flag);
 //    Serial.println(angle_values[0]);
 //    Serial.println(angle_values[1]);
 //    Serial.println(angle_values[2]);
 //    pid returns duty cycles
     duty = PIDMovementCalc(angle_values);
-    Serial.println("x axis duty cycle");
-    Serial.println(duty[0]);
+    //Serial.println("x axis duty cycle");
+    //Serial.println(duty[0]);
 //    Serial.println(duty[1]);
 //    Serial.println(duty[2]);
 
     //set duty cycles
-    if(duty[0] == 50){
-        digitalWrite(brake_x, LOW);
-    }else{
-        digitalWrite(brake_x, HIGH);
-    }
-    motorPin.duty(duty[0]);
+    motorPinx.duty(duty[0]);
     //repeat
 }
 

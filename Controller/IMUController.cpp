@@ -31,10 +31,12 @@
  *                False - Failure
  ******************************************************************************/
     IMUController::IMUController (int addr){
-        interruptNum = 0;
-        if(addr != 0){
+        if(addr == 0){
+            interruptNum = 0;
+            mpu = MPU6050(0x68);
+        }else{
             interruptNum = 1;
-            mpu = MPU6050(MPU6050_ADDRESS_AD0_HIGH);
+            mpu = MPU6050(0x69);
         }
     }
  
@@ -42,7 +44,7 @@
         // join I2C bus (I2Cdev library doesn't do this automatically)
     #if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
         Wire.begin();
-        // TWBR = 24; // 400kHz I2C clock (200kHz if CPU is 8MHz)
+       // TWBR = 24; // 400kHz I2C clock (200kHz if CPU is 8MHz)
     #elif I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_FASTWIRE
         Fastwire::setup(400, true);
     #endif
@@ -68,10 +70,10 @@
     Serial.println(mpu.testConnection() ? F("MPU6050 connection successful") : F("MPU6050 connection failed"));
 
     // wait for ready
-    Serial.println(F("\nSend any character to begin DMP programming and demo: "));
+    //Serial.println(F("\nSend any character to begin DMP programming and demo: "));
     while (Serial.available() && Serial.read()); // empty buffer
-    while (!Serial.available());                 // wait for data
-    while (Serial.available() && Serial.read()); // empty buffer again
+    //while (!Serial.available());                 // wait for data
+    //while (Serial.available() && Serial.read()); // empty buffer again
 
     // load and configure the DMP
     Serial.println(F("Initializing DMP..."));
@@ -102,6 +104,7 @@
 
         // set our DMP Ready flag so the main loop() function knows it's okay to use it
         Serial.println(F("DMP ready! Waiting for first interrupt..."));
+        Serial.println(" ");
         dmpReady = true;
 
         // get expected DMP packet size for later comparison
@@ -171,7 +174,6 @@ bool IMUController::poll(float* angle_values){
     
         // get current FIFO count
         fifoCount = mpu.getFIFOCount();
-    
         // check for overflow (this should never happen unless our code is too inefficient)
         if ((mpuIntStatus & 0x10) || fifoCount == 1024) {
             // reset so we can continue cleanly
