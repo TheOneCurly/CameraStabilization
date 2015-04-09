@@ -84,6 +84,7 @@ void setup() {
     
     // Set up IMU connection
     imu.init();
+    imu_error.init();
     
     // Grab initial values
     if(imu.poll(angle_values))
@@ -104,12 +105,13 @@ void setup() {
 void loop() {
     bool angles_flag;
     //get angles from poll
+    imu_error.poll(angle_values);
     angles_flag = imu.poll(angle_values);
 //    Serial.println(angles_flag);
 //    Serial.println(angle_values[0]);
 //    Serial.println(angle_values[1]);
 //    Serial.println(angle_values[2]);
-    //pid returns duty cycles
+//    pid returns duty cycles
     duty = PIDMovementCalc(angle_values);
     Serial.println("x axis duty cycle");
     Serial.println(duty[0]);

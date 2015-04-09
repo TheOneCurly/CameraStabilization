@@ -30,7 +30,7 @@
  *                True - success
  *                False - Failure
  ******************************************************************************/
-    IMUController::IMUController (int addr = 0){
+    IMUController::IMUController (int addr){
         interruptNum = 0;
         if(addr != 0){
             interruptNum = 1;
