@@ -13,6 +13,9 @@
  
 #include "PID.h"
 #include "customPWM.h"
+
+const float ANGLE_INIT_THRESHOLD = 0.2;
+
 // declare pins
 const int PWM_pin_x = 34;
 const int brake_x = 6;
@@ -28,8 +31,8 @@ const int enable_z = 11;
 
 bool isGood = customPWMinit(20000, 100);
 customPWM motorPinx(PWM_pin_x);
-customPWM motorPiny(PWM_pin_y);
-customPWM motorPinz(PWM_pin_z);
+//customPWM motorPiny(PWM_pin_y);
+//customPWM motorPinz(PWM_pin_z);
 
 // Arduino Wire library is required if I2Cdev I2CDEV_ARDUINO_WIRE implementation
 // is used in I2Cdev.h
@@ -44,6 +47,7 @@ IMUController imu_error(1);
 int* duty;
 float* angle_values = (float*) malloc(3*sizeof(float));
 float* error_angle_values = (float*) malloc(3*sizeof(float));
+float* angle_values_init = (float*) malloc(3*sizeof(float));
 // ================================================================
 // ===               INTERRUPT DETECTION ROUTINE                ===
 // ================================================================
@@ -83,18 +87,36 @@ void setup() {
     attachInterrupt(0, dmp0DataReady, RISING);
     attachInterrupt(1, dmp1DataReady, RISING);
     
-    // Set up IMU connection
+    // Set up IMU connection///////////////////////////////////////////////////clean this shit
     imu.init();
-    imu_error.init();
-
-    
-    // Grab initial values
     while(!imu.poll(angle_values));
+    //setBaseAngles(angle_values,0);
+    //if(imu.poll(angle_values))  
+    do{
+      angle_values_init[0] = angle_values[0];
+      angle_values_init[1] = angle_values[1];
+      angle_values_init[2] = angle_values[2];
+      imu.poll(angle_values);
+      Serial.println("init...");
+    }while(abs(angle_values[0] - angle_values_init[0])>ANGLE_INIT_THRESHOLD || abs(angle_values[1] - angle_values_init[1])>ANGLE_INIT_THRESHOLD || abs(angle_values[2] - angle_values_init[2])>ANGLE_INIT_THRESHOLD);
     setBaseAngles(angle_values,0);
     
-    while(!imu_error.poll(error_angle_values));
+    imu_error.init();
+    while(!imu_error.poll(error_angle_values)){
+      imu.poll(angle_values);
+    }
+    //setBaseAngles(error_angle_values,1);
+    do{
+      angle_values_init[0] = error_angle_values[0];
+      angle_values_init[1] = error_angle_values[1];
+      angle_values_init[2] = error_angle_values[2];
+      imu_error.poll(error_angle_values);
+      imu.poll(angle_values);
+      Serial.println("init...");
+    }while(abs(error_angle_values[0] - angle_values_init[0])>ANGLE_INIT_THRESHOLD || abs(error_angle_values[1] - angle_values_init[1])>ANGLE_INIT_THRESHOLD || abs(error_angle_values[2] - angle_values_init[2])>ANGLE_INIT_THRESHOLD);
     setBaseAngles(error_angle_values,1);
-        
+    //////////////////////////////////////////////////////////////////////
+    
     // Enable movement
     digitalWrite(enable_x, HIGH);
     digitalWrite(enable_y, HIGH);
