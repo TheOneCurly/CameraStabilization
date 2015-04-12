@@ -43,6 +43,8 @@ static int system_weight = 800;
 static int system_power = 100;
 static int system_performance = 100;
 
+static int kp = 1;
+static int ki = 1;
 
 /**
  *
@@ -101,8 +103,42 @@ int* PIDMovementCalc(float* angles){
  *
  *
  ******************************************************************************/
-int* PIDMovementCalc_withError(float* angless){
-
+int* PIDMovementCalc_withError(float* angles, float* errorAngles){
+    int* dutyCycles = (int*)malloc(3*sizeof(int));
+    
+    int xControl, yControl, zControl;
+    int xError, yError, zError;
+    
+    // Main IMU error
+    xControl = (angles[0] - baseAngles[0]);
+    yControl = (angles[1] - baseAngles[1]);
+    zControl = (angles[2] - baseAngles[2]);
+    
+    // Error IMU error
+    xError = (errorAngles[0] - errorBaseAngles[0]);
+    yError = (errorAngles[1] - errorBaseAngles[1]);
+    zError = (errorAngles[2] - errorBaseAngles[2]);
+    
+    // X-axis
+    if(X_control_en){
+        dutyCycles[0] = kp*xControl + kp*xError;
+    }else{
+        dutyCycles[0] = 50;
+    }
+    
+    // Y-axis
+    if(Y_control_en){
+        dutyCycles[1] = kp*yControl + kp*yError;
+    }else{
+        dutyCycles[1] = 50;
+    }
+    
+    // Z-axis
+    if(Z_control_en){
+        dutyCycles[2] = kp*zControl + kp*zError;
+    }else{
+        dutyCycles[2] = 50;
+    }
 }
 
 
