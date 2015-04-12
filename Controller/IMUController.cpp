@@ -51,7 +51,7 @@
     
     #ifdef DEBUG
     // initialize serial communication
-    Serial.begin(115200);
+    //Serial.begin(115200);
     
     while (!Serial); // wait for Leonardo enumeration, others continue immediately
 
@@ -210,9 +210,9 @@ bool IMUController::poll(float* angle_values){
                 Serial.print("ypr\t");
                 Serial.print(ypr_avg[0] * 18/M_PI);
                 Serial.print("\t");
-                Serial.print(ypr_avg[2] * 18/M_PI);
+                Serial.print(ypr_avg[1] * 18/M_PI);
                 Serial.print("\t");
-                Serial.println(ypr_avg[1] * 18/M_PI);
+                Serial.println(ypr_avg[2] * 18/M_PI);
               #endif
   
               ypr_avg[0] = ypr_avg[0] * 18/M_PI;

@@ -37,6 +37,9 @@ customPWM motorPinx(PWM_pin_x);
 // Arduino Wire library is required if I2Cdev I2CDEV_ARDUINO_WIRE implementation
 // is used in I2Cdev.h
 #if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
+    //#ifndef TWI_FREQ
+    //#define TWI_FREQ 400000L
+    //#endif
     #include "Wire.h"
 #endif
 
@@ -48,6 +51,7 @@ int* duty;
 float* angle_values = (float*) malloc(3*sizeof(float));
 float* error_angle_values = (float*) malloc(3*sizeof(float));
 float* angle_values_init = (float*) malloc(3*sizeof(float));
+float* error_angle_values_init = (float*) malloc(3*sizeof(float));
 // ================================================================
 // ===               INTERRUPT DETECTION ROUTINE                ===
 // ================================================================
@@ -65,6 +69,8 @@ void dmp1DataReady() {
 // ================================================================
 
 void setup() {
+    Serial.begin(115200);
+  
     // Set pin modes
     pinMode(brake_x, OUTPUT);
     pinMode(brake_y, OUTPUT);
@@ -87,35 +93,46 @@ void setup() {
     attachInterrupt(0, dmp0DataReady, RISING);
     attachInterrupt(1, dmp1DataReady, RISING);
     
-    // Set up IMU connection///////////////////////////////////////////////////clean this shit
     imu.init();
-    while(!imu.poll(angle_values));
-    //setBaseAngles(angle_values,0);
-    //if(imu.poll(angle_values))  
-    do{
+    imu_error.init();
+    bool imu_ready = false;
+    bool imu_error_ready = false;
+    
+    imu_error.poll(error_angle_values);
+    imu.poll(angle_values);
+    
+    bool imu_valid = false;
+    bool imu_error_valid = false;
+    
+    while(!imu_ready || !imu_error_ready){
+      delay(50);
+      imu_valid = false;
+      imu_error_valid = false;
       angle_values_init[0] = angle_values[0];
       angle_values_init[1] = angle_values[1];
       angle_values_init[2] = angle_values[2];
-      imu.poll(angle_values);
-      Serial.println("init...");
-    }while(abs(angle_values[0] - angle_values_init[0])>ANGLE_INIT_THRESHOLD || abs(angle_values[1] - angle_values_init[1])>ANGLE_INIT_THRESHOLD || abs(angle_values[2] - angle_values_init[2])>ANGLE_INIT_THRESHOLD);
-    setBaseAngles(angle_values,0);
-    
-    imu_error.init();
-    while(!imu_error.poll(error_angle_values)){
-      imu.poll(angle_values);
+     
+      error_angle_values_init[0] = error_angle_values[0];
+      error_angle_values_init[1] = error_angle_values[1];
+      error_angle_values_init[2] = error_angle_values[2];
+      
+      imu_valid = imu.poll(angle_values);
+      imu_error_valid = imu_error.poll(error_angle_values);
+      
+      if(imu_valid && !imu_ready){ 
+        if((abs(angle_values[0] - angle_values_init[0])<ANGLE_INIT_THRESHOLD && abs(angle_values[1] - angle_values_init[1])<ANGLE_INIT_THRESHOLD && abs(angle_values[2] - angle_values_init[2])<ANGLE_INIT_THRESHOLD)){
+          setBaseAngles(angle_values,0);
+          imu_ready = true;
+        }
+      }
+      
+      if(imu_error_valid && !imu_error_ready){
+        if((abs(error_angle_values[0] - error_angle_values_init[0])<ANGLE_INIT_THRESHOLD && abs(error_angle_values[1] - error_angle_values_init[1])<ANGLE_INIT_THRESHOLD && abs(error_angle_values[2] - error_angle_values_init[2])<ANGLE_INIT_THRESHOLD)){
+          setBaseAngles(error_angle_values,1);
+          imu_error_ready = true;
+        }
+      }
     }
-    //setBaseAngles(error_angle_values,1);
-    do{
-      angle_values_init[0] = error_angle_values[0];
-      angle_values_init[1] = error_angle_values[1];
-      angle_values_init[2] = error_angle_values[2];
-      imu_error.poll(error_angle_values);
-      imu.poll(angle_values);
-      Serial.println("init...");
-    }while(abs(error_angle_values[0] - angle_values_init[0])>ANGLE_INIT_THRESHOLD || abs(error_angle_values[1] - angle_values_init[1])>ANGLE_INIT_THRESHOLD || abs(error_angle_values[2] - angle_values_init[2])>ANGLE_INIT_THRESHOLD);
-    setBaseAngles(error_angle_values,1);
-    //////////////////////////////////////////////////////////////////////
     
     // Enable movement
     digitalWrite(enable_x, HIGH);
