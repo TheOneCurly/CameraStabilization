@@ -45,7 +45,7 @@ static int system_performance = 100;
 
 static int kp = 1;
 static int ki = 1;
-
+static int t_last = 0;
 /**
  *
  * Calculates the movement of each of the 3 three-phase BLDC motors as they 
@@ -108,6 +108,7 @@ int* PIDMovementCalc_withError(float* angles, float* errorAngles){
     
     int xControl, yControl, zControl;
     int xError, yError, zError;
+    int t = millis();
     
     // Main IMU error
     xControl = (angles[0] - baseAngles[0]);
@@ -121,24 +122,28 @@ int* PIDMovementCalc_withError(float* angles, float* errorAngles){
     
     // X-axis
     if(X_control_en){
-        dutyCycles[0] = kp*xControl + kp*xError;
+        dutyCycles[0] = kp*xControl + ki*xControl*(t - t_last) + kp*xError + ki*xError*(t - t_last);
     }else{
         dutyCycles[0] = 50;
     }
     
     // Y-axis
     if(Y_control_en){
-        dutyCycles[1] = kp*yControl + kp*yError;
+        dutyCycles[1] = kp*yControl + ki*yControl*(t - t_last) + kp*yError + ki*yError*(t - t_last);
     }else{
         dutyCycles[1] = 50;
     }
     
     // Z-axis
     if(Z_control_en){
-        dutyCycles[2] = kp*zControl + kp*zError;
+        dutyCycles[2] = kp*zControl + ki*zControl*(t - t_last) + kp*zError + ki*zError*(t - t_last);
     }else{
         dutyCycles[2] = 50;
     }
+    
+    t_last = t;
+    
+    return dutyCycles;
 }
 
 
