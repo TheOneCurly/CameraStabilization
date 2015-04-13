@@ -43,8 +43,8 @@ static int system_weight = 800;
 static int system_power = 100;
 static int system_performance = 100;
 
-static int kp = 1;
-static int ki = 1;
+static int kp = 5;
+static int ki = .5;
 static int t_last = 0;
 /**
  *
@@ -122,21 +122,24 @@ int* PIDMovementCalc_withError(float* angles, float* errorAngles){
     
     // X-axis
     if(X_control_en){
-        dutyCycles[0] = kp*xControl + ki*xControl*(t - t_last) + kp*xError + ki*xError*(t - t_last);
+//        dutyCycles[0] = kp*xControl + ki*xControl*(t - t_last) + kp*xError + ki*xError*(t - t_last);
+        dutyCycles[0] = kp*xError;
     }else{
         dutyCycles[0] = 50;
     }
     
     // Y-axis
     if(Y_control_en){
-        dutyCycles[1] = kp*yControl + ki*yControl*(t - t_last) + kp*yError + ki*yError*(t - t_last);
+//        dutyCycles[1] = kp*yControl + ki*yControl*(t - t_last) + kp*yError + ki*yError*(t - t_last);
+        dutyCycles[1] = kp*yError;
     }else{
         dutyCycles[1] = 50;
     }
     
     // Z-axis
     if(Z_control_en){
-        dutyCycles[2] = kp*zControl + ki*zControl*(t - t_last) + kp*zError + ki*zError*(t - t_last);
+ //       dutyCycles[2] = kp*zControl + ki*zControl*(t - t_last) + kp*zError + ki*zError*(t - t_last);
+        dutyCycles[2] = kp*zError;
     }else{
         dutyCycles[2] = 50;
     }
@@ -319,17 +322,30 @@ void setBaseAngles(float* base, int imu){
         baseAngles[0] = base[0];
         baseAngles[1] = base[1];
         baseAngles[2] = base[2];
-        Serial.println("base angles");
-    Serial.println(baseAngles[0]);
-    Serial.println(baseAngles[1]);
-    Serial.println(baseAngles[2]);
+//        Serial.println("base angles");
+//    Serial.println(baseAngles[0]);
+//    Serial.println(baseAngles[1]);
+//    Serial.println(baseAngles[2]);
     }else if(imu == 1){
         errorBaseAngles[0] = base[0];
         errorBaseAngles[1] = base[1];
         errorBaseAngles[2] = base[2];
-        Serial.println("error base angles");
-    Serial.println(errorBaseAngles[0]);
-    Serial.println(errorBaseAngles[1]);
-    Serial.println(errorBaseAngles[2]);
+//        Serial.println("error base angles");
+//    Serial.println(errorBaseAngles[0]);
+//    Serial.println(errorBaseAngles[1]);
+//    Serial.println(errorBaseAngles[2]);
     }
+}
+
+/******************************************************************************
+ *
+ * Set position to hold the platorm at for each IMU
+ *
+ *
+ * @return
+ *
+ *
+ ******************************************************************************/
+void setHoldPosition(float* control, float* error){
+     
 }
