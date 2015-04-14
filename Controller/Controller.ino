@@ -73,7 +73,9 @@ void dmp1DataReady() {
 
 void setup() {
     Serial.begin(115200);
-  
+    
+    pinMode(27, OUTPUT);
+      digitalWrite(27, HIGH);
     // Set pin modes
     pinMode(brake_x, OUTPUT);
     pinMode(brake_y, OUTPUT);
@@ -108,7 +110,7 @@ void setup() {
     bool imu_error_valid = false;
     
     while(!imu_ready || !imu_error_ready){
-      delay(50);
+      delay(10);
       imu_valid = false;
       imu_error_valid = false;
       angle_values_init[0] = angle_values[0];
@@ -141,7 +143,7 @@ void setup() {
     digitalWrite(enable_x, HIGH);
     digitalWrite(enable_y, HIGH);
     digitalWrite(enable_z, HIGH);
-    
+    digitalWrite(27, LOW);
     free(angle_values_init);
     free(error_angle_values_init);
 }
@@ -153,6 +155,7 @@ void setup() {
 // ================================================================
 
 void loop() {
+    //digitalWrite(27, LOW);
     //get angles from poll
     error_imu_flag = imu_error.poll(error_angle_values);
     base_imu_flag = imu.poll(angle_values);
@@ -179,6 +182,8 @@ void loop() {
     motorPinx.duty(duty[0]);
     //motorPiny.duty(duty[1]);
     //motorPinz.duty(duty[2]);
+    
+    free(duty);
     //repeat
 }
 
