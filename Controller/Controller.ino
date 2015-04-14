@@ -29,6 +29,9 @@ const int PWM_pin_z = 5;
 const int brake_z = 8;
 const int enable_z = 11;
 
+bool base_imu_flag;
+bool error_imu_flag;
+    
 bool isGood = customPWMinit(20000, 100);
 customPWM motorPinx(PWM_pin_x);
 //customPWM motorPiny(PWM_pin_y);
@@ -138,6 +141,9 @@ void setup() {
     digitalWrite(enable_x, HIGH);
     digitalWrite(enable_y, HIGH);
     digitalWrite(enable_z, HIGH);
+    
+    free(angle_values_init);
+    free(error_angle_values_init);
 }
 
 
@@ -147,26 +153,32 @@ void setup() {
 // ================================================================
 
 void loop() {
-    bool angles_flag;
     //get angles from poll
-    
-    imu_error.poll(error_angle_values);
-    angles_flag = imu.poll(angle_values);
-        
-    Serial.println(" ");
+    error_imu_flag = imu_error.poll(error_angle_values);
+    base_imu_flag = imu.poll(angle_values);
+
+//    debug        
+//    Serial.println(" ");
 //    Serial.println(angles_flag);
 //    Serial.println(angle_values[0]);
 //    Serial.println(angle_values[1]);
 //    Serial.println(angle_values[2]);
-//    pid returns duty cycles
+
+//    pid returns 3 duty cycles
     duty = PIDMovementCalc_withError(angle_values, error_angle_values);
-    //Serial.println("x axis duty cycle");
-    //Serial.println(duty[0]);
+    
+//    debug
+//    Serial.println("x axis duty cycle");
+//    Serial.println(duty[0]);
 //    Serial.println(duty[1]);
 //    Serial.println(duty[2]);
+
     Serial.println(duty[0]);
+    
     //set duty cycles
-    //motorPinx.duty(duty[0]);
+    motorPinx.duty(duty[0]);
+    //motorPiny.duty(duty[1]);
+    //motorPinz.duty(duty[2]);
     //repeat
 }
 
