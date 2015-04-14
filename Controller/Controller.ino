@@ -155,9 +155,9 @@ void loop() {
         
     Serial.println(" ");
 //    Serial.println(angles_flag);
-    Serial.println(angle_values[0]);
-    Serial.println(angle_values[1]);
-    Serial.println(angle_values[2]);
+//    Serial.println(angle_values[0]);
+//    Serial.println(angle_values[1]);
+//    Serial.println(angle_values[2]);
 //    pid returns duty cycles
     duty = PIDMovementCalc_withError(angle_values, error_angle_values);
     //Serial.println("x axis duty cycle");

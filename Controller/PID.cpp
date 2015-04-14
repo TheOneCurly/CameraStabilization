@@ -322,18 +322,18 @@ void setBaseAngles(float* base, int imu){
         baseAngles[0] = base[0];
         baseAngles[1] = base[1];
         baseAngles[2] = base[2];
-//        Serial.println("base angles");
-//    Serial.println(baseAngles[0]);
-//    Serial.println(baseAngles[1]);
-//    Serial.println(baseAngles[2]);
+        Serial.println("base angles");
+        Serial.println(baseAngles[0]);
+        Serial.println(baseAngles[1]);
+        Serial.println(baseAngles[2]);
     }else if(imu == 1){
         errorBaseAngles[0] = base[0];
         errorBaseAngles[1] = base[1];
         errorBaseAngles[2] = base[2];
-//        Serial.println("error base angles");
-//    Serial.println(errorBaseAngles[0]);
-//    Serial.println(errorBaseAngles[1]);
-//    Serial.println(errorBaseAngles[2]);
+        Serial.println("error base angles");
+        Serial.println(errorBaseAngles[0]);
+        Serial.println(errorBaseAngles[1]);
+        Serial.println(errorBaseAngles[2]);
     }
 }
 
