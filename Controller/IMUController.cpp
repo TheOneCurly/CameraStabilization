@@ -30,15 +30,15 @@
  *                True - success
  *                False - Failure
  ******************************************************************************/
-    IMUController::IMUController (int addr){
-        if(addr == 0){
-            interruptNum = 0;
-            mpu = MPU6050(0x68);
-        }else{
-            interruptNum = 1;
-            mpu = MPU6050(0x69);
-        }
-    }
+  IMUController::IMUController (int addr){
+      if(addr == 0){
+          interruptNum = 0;
+          mpu = MPU6050(0x68);
+      }else{
+          interruptNum = 1;
+          mpu = MPU6050(0x69);
+      }
+  }
  
  bool IMUController::init(){
         // join I2C bus (I2Cdev library doesn't do this automatically)
