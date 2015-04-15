@@ -17,6 +17,8 @@
 
 /***************************** Variables *********************************/
 
+const int AVERAGE_COUNT = 5;
+
 /***************************** ISR *********************************/
 
 
@@ -166,7 +168,7 @@ bool IMUController::poll(float* angle_values){
     
     if (!dmpReady) return false;
     
-    while(ypr_count < 11){
+    while(ypr_count < (AVERAGE_COUNT + 1)){
       if (mpuInterrupt || fifoCount >= packetSize){  
         // reset interrupt flag and get INT_STATUS byte
         mpuInterrupt = false;
@@ -200,7 +202,7 @@ bool IMUController::poll(float* angle_values){
             mpu.dmpGetQuaternion(&q, fifoBuffer);
             mpu.dmpGetGravity(&gravity, &q);
             mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
-            if (ypr_count < 10) {
+            if (ypr_count < AVERAGE_COUNT) {
               ypr_avg[0] += ypr[0];
               ypr_avg[1] += ypr[1];
               ypr_avg[2] += ypr[2];
@@ -209,16 +211,16 @@ bool IMUController::poll(float* angle_values){
               #ifdef DEBUG
                 Serial.print(interruptNum);
                 Serial.print("\t ypr\t");
-                Serial.print(ypr_avg[0] * 18/M_PI);
+                Serial.print(ypr_avg[0] * 180/(AVERAGE_COUNT*M_PI));
                 Serial.print("\t");
-                Serial.print(ypr_avg[1] * 18/M_PI);
+                Serial.print(ypr_avg[1] * 180/(AVERAGE_COUNT*M_PI));
                 Serial.print("\t");
-                Serial.println(ypr_avg[2] * 18/M_PI);
+                Serial.println(ypr_avg[2] * 180/(AVERAGE_COUNT*M_PI));
               #endif
   
-              ypr_avg[0] = ypr_avg[0] * 18/M_PI;
-              ypr_avg[1] = ypr_avg[1] * 18/M_PI;
-              ypr_avg[2] = ypr_avg[2] * 18/M_PI;
+              ypr_avg[0] = ypr_avg[0] * 180/(AVERAGE_COUNT*M_PI));
+              ypr_avg[1] = ypr_avg[1] * 180/(AVERAGE_COUNT*M_PI));
+              ypr_avg[2] = ypr_avg[2] * 180/(AVERAGE_COUNT*M_PI));
               
               angle_values[0] = ypr_avg[0];
               angle_values[1] = ypr_avg[1];
