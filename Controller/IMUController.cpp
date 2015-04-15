@@ -207,7 +207,8 @@ bool IMUController::poll(float* angle_values){
               ypr_count ++;
             }else{
               #ifdef DEBUG
-                Serial.print("ypr\t");
+                Serial.print(interruptNum);
+                Serial.print("\t ypr\t");
                 Serial.print(ypr_avg[0] * 18/M_PI);
                 Serial.print("\t");
                 Serial.print(ypr_avg[1] * 18/M_PI);
