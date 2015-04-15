@@ -17,7 +17,7 @@
 
 /***************************** Variables *********************************/
 
-const int AVERAGE_COUNT = 5;
+const int AVERAGE_COUNT = 6;
 
 /***************************** ISR *********************************/
 
@@ -218,9 +218,9 @@ bool IMUController::poll(float* angle_values){
                 Serial.println(ypr_avg[2] * 180/(AVERAGE_COUNT*M_PI));
               #endif
   
-              ypr_avg[0] = ypr_avg[0] * 180/(AVERAGE_COUNT*M_PI));
-              ypr_avg[1] = ypr_avg[1] * 180/(AVERAGE_COUNT*M_PI));
-              ypr_avg[2] = ypr_avg[2] * 180/(AVERAGE_COUNT*M_PI));
+              ypr_avg[0] = ypr_avg[0] * 180/(AVERAGE_COUNT*M_PI);
+              ypr_avg[1] = ypr_avg[1] * 180/(AVERAGE_COUNT*M_PI);
+              ypr_avg[2] = ypr_avg[2] * 180/(AVERAGE_COUNT*M_PI);
               
               angle_values[0] = ypr_avg[0];
               angle_values[1] = ypr_avg[1];
