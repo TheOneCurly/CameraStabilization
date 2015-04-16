@@ -12,6 +12,6 @@ void loop() {
   // put your main code here, to run repeatedly:
 
   LCD_movement_handler();
-  delay(500);
+  delay(10);
 }
 

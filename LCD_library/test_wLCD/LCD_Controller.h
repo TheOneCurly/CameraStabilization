@@ -90,7 +90,7 @@ static int cur_selection, cur_sel_max, cur_sel_min = 0;
 static int adjust_val = 0;
 static int cur_axis = 0;
 static int next_move = 0;
-static int back_button_pushed = 0;
+
 //static char menu_header[] = "                    ";
 
 //Used to determine which page should be drawn
@@ -101,8 +101,6 @@ static int back_button_pushed = 0;
 
 void initialize_LCD();
 void LCD_movement_handler();
-void toggle_interrupt_handler();
-void button_interrupt_handler();
 void respond_to_action();
 void u8g_prepare();
 void draw_home( int cur_menu_index );
@@ -110,9 +108,12 @@ void draw_sys( int cur_menu_index );
 void draw_axis_select( int cur_menu_index );
 void draw_axis_options( int cur_menu_index, int axis);
 void draw_axis_control( int axis );
+void draw_settings();
 void draw();
-
+void handle_menu_context();
 void joystick_handler();
+void fwd_butt_handler();
+void bck_butt_handler();
 
 void handle_select( int command );
 
