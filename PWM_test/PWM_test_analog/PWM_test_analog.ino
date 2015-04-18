@@ -7,6 +7,8 @@
 
 // initialize pwm pin, using digital write this can be any digital out pin
 int PWM_output_pin = 34;
+const int brake_x = 6;
+const int enable_x = 9;
 
 bool isGood = customPWMinit(20000, 100);
 customPWM motorPin(PWM_output_pin);
@@ -17,8 +19,11 @@ void setup(){
 
 	Serial.print("Initializing PWM output on pin: ");
 	Serial.println(PWM_output_pin);
-	
+	pinMode(brake_x, OUTPUT);
+        pinMode(enable_x, OUTPUT);
 	//pinMode(PWM_output_pin, OUTPUT);
+        digitalWrite(brake_x, HIGH);
+        digitalWrite(enable_x, HIGH);
 }
 
 void loop(){
@@ -54,10 +59,10 @@ void loop(){
 //    motorPin.duty(50);
 //    delay(2000);
 
-motorPin.duty(75);
-delay(350);
-motorPin.duty(25);
-delay(350);
+//motorPin.duty(75);
+//delay(350);
+//motorPin.duty(25);
+//delay(350);
 //motorPin.duty(100);
 //delay(170);
 //motorPin.duty(0);
@@ -69,26 +74,26 @@ delay(350);
   //motorPin.duty(0);
   //delay(2000);
   //motorPin.duty(100);
-//        int i = 0;
-//        for (i = 0; i <= 50; i++){
-//            motorPin.duty(i);
-//            delay(100);
-//        }
-//        
-//        for (i = 50; i <= 100; i++){
-//            motorPin.duty(i);
-//            delay(100);
-//        }
-//        
-//        for (i = 100; i >= 50; i--){
-//            motorPin.duty(i);
-//            delay(100);
-//        }
-//        
-//        for (i = 50; i >= 0; i--){
-//            motorPin.duty(i);
-//            delay(100);
-//        }
+        int i = 0;
+        for (i = 0; i <= 50; i++){
+            motorPin.duty(i);
+            delay(100);
+        }
+        
+        for (i = 50; i <= 100; i++){
+            motorPin.duty(i);
+            delay(100);
+        }
+        
+        for (i = 100; i >= 50; i--){
+            motorPin.duty(i);
+            delay(100);
+        }
+        
+        for (i = 50; i >= 0; i--){
+            motorPin.duty(i);
+            delay(100);
+        }
 
 }
 

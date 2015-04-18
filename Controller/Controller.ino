@@ -21,11 +21,11 @@ const int PWM_pin_x = 34;
 const int brake_x = 6;
 const int enable_x = 9;
 
-const int PWM_pin_y = 3;
+const int PWM_pin_y = 36;
 const int brake_y = 7;
 const int enable_y = 10;
 
-const int PWM_pin_z = 5;
+const int PWM_pin_z = 38;
 const int brake_z = 8;
 const int enable_z = 11;
 
@@ -34,8 +34,8 @@ bool error_imu_flag;
     
 bool isGood = customPWMinit(20000, 100);
 customPWM motorPinx(PWM_pin_x);
-//customPWM motorPiny(PWM_pin_y);
-//customPWM motorPinz(PWM_pin_z);
+customPWM motorPiny(PWM_pin_y);
+customPWM motorPinz(PWM_pin_z);
 
 // Arduino Wire library is required if I2Cdev I2CDEV_ARDUINO_WIRE implementation
 // is used in I2Cdev.h
