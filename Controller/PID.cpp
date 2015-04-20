@@ -133,7 +133,6 @@ int* PIDMovementCalc_withError(float* angles, float* errorAngles){
         //Serial.println(xDuty);
         xDuty = constrain(xDuty, -150, 150);
         dutyCycles[0] = map(xDuty, -150, 150, 0, 100);
-        Serial.println(dutyCycles[0]);
     }else{
         dutyCycles[0] = 50;
     }
