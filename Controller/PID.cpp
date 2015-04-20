@@ -119,7 +119,7 @@ int* PIDMovementCalc_withError(float* angles, float* errorAngles){
     
     // Error IMU error
     xError = xControl/(xControl - (errorAngles[0] - errorBaseAngles[0]));
-    Serial.println(xError);
+//    Serial.println(xError);
     yError = yControl/(yControl - (errorAngles[1] - errorBaseAngles[1]));
     zError = zControl/(zControl - (errorAngles[2] - errorBaseAngles[2]));
     

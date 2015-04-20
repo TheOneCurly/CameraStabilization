@@ -228,7 +228,8 @@ bool IMUController::poll(float* angle_values){
               ypr_count = 0;
               ypr_avg[0] = 0;
               ypr_avg[1] = 0;
-              ypr_avg[2] = 0;       
+              ypr_avg[2] = 0;
+              mpu.resetFIFO();       
               return true;          
             }
         }

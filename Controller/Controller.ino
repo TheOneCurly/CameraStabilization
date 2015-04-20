@@ -32,7 +32,7 @@ const int enable_z = 11;
 bool base_imu_flag;
 bool error_imu_flag;
     
-bool isGood = customPWMinit(20000, 100);
+bool PWMisGood = customPWMinit(20000, 100);
 customPWM motorPinx(PWM_pin_x);
 customPWM motorPiny(PWM_pin_y);
 customPWM motorPinz(PWM_pin_z);
@@ -50,7 +50,7 @@ customPWM motorPinz(PWM_pin_z);
 IMUController imu(0);
 IMUController imu_error(1);
 
-int* duty;
+int* duty = (int*) malloc(3*sizeof(int));
 float* angle_values = (float*) malloc(3*sizeof(float));
 float* error_angle_values = (float*) malloc(3*sizeof(float));
 float* angle_values_init = (float*) malloc(3*sizeof(float));
@@ -75,7 +75,7 @@ void setup() {
     Serial.begin(115200);
     
     pinMode(27, OUTPUT);
-      digitalWrite(27, HIGH);
+    digitalWrite(27, HIGH);
     // Set pin modes
     pinMode(brake_x, OUTPUT);
     pinMode(brake_y, OUTPUT);
@@ -103,14 +103,14 @@ void setup() {
     bool imu_ready = false;
     bool imu_error_ready = false;
     
-    imu_error.poll(error_angle_values);
     imu.poll(angle_values);
+    imu_error.poll(error_angle_values);
     
     bool imu_valid = false;
     bool imu_error_valid = false;
     
     while(!imu_ready || !imu_error_ready){
-      delay(10);
+      //delay(15);
       imu_valid = false;
       imu_error_valid = false;
       angle_values_init[0] = angle_values[0];
@@ -157,8 +157,8 @@ void setup() {
 void loop() {
     //digitalWrite(27, LOW);
     //get angles from poll
-    error_imu_flag = imu_error.poll(error_angle_values);
     base_imu_flag = imu.poll(angle_values);
+    error_imu_flag = imu_error.poll(error_angle_values);
 
 //    debug        
 //    Serial.println(" ");
@@ -167,24 +167,30 @@ void loop() {
 //    Serial.println(angle_values[1]);
 //    Serial.println(angle_values[2]);
 
-//    pid returns 3 duty cycles
-    duty = PIDMovementCalc_withError(angle_values, error_angle_values);
-    
-//    debug
-//    Serial.println("x axis duty cycle");
-//    Serial.println(duty[0]);
-//    Serial.println(duty[1]);
-//    Serial.println(duty[2]);
-
-    Serial.println(duty[0]);
-    
-    //set duty cycles
-    motorPinx.duty(duty[0]);
-    //motorPiny.duty(duty[1]);
-    //motorPinz.duty(duty[2]);
-    
-    free(duty);
-    //repeat
+    //pid returns 3 duty cycles
+    //ignore cases where there was a fifo overflow
+    if( error_imu_flag && base_imu_flag ){
+      duty = PIDMovementCalc_withError(angle_values, error_angle_values);
+      
+        //    debug
+  //    Serial.println("x axis duty cycle");
+  //    Serial.println(duty[0]);
+  //    Serial.println(duty[1]);
+  //    Serial.println(duty[2]);
+  
+//      Serial.println(duty[0]);
+      
+      //set duty cycles
+      motorPinx.duty(duty[0]);
+      motorPiny.duty(duty[1]);
+      motorPinz.duty(duty[2]);
+      
+      //free(duty);
+      //repeat
+    }
+    else{
+      Serial.println("ignoring duty calc because of fifo overflow");
+    }
 }
 
 

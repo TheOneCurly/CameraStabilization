@@ -69,31 +69,34 @@ void loop(){
 //delay(170);
 
 
-  //motorPin.duty(100);
-  //delay(2000);
-  //motorPin.duty(0);
-  //delay(2000);
-  //motorPin.duty(100);
-        int i = 0;
-        for (i = 0; i <= 50; i++){
-            motorPin.duty(i);
-            delay(100);
-        }
-        
-        for (i = 50; i <= 100; i++){
-            motorPin.duty(i);
-            delay(100);
-        }
-        
-        for (i = 100; i >= 50; i--){
-            motorPin.duty(i);
-            delay(100);
-        }
-        
-        for (i = 50; i >= 0; i--){
-            motorPin.duty(i);
-            delay(100);
-        }
+  motorPin.duty(75);
+  delay(1000);
+  motorPin.duty(50);
+  delay(1000);
+  motorPin.duty(25);
+  delay(1000);
+  motorPin.duty(50);
+  delay(1000);
+//        int i = 0;
+//        for (i = 0; i <= 50; i++){
+//            motorPin.duty(i);
+//            delay(100);
+//        }
+//        
+//        for (i = 50; i <= 100; i++){
+//            motorPin.duty(i);
+//            delay(100);
+//        }
+//        
+//        for (i = 100; i >= 50; i--){
+//            motorPin.duty(i);
+//            delay(100);
+//        }
+//        
+//        for (i = 50; i >= 0; i--){
+//            motorPin.duty(i);
+//            delay(100);
+//        }
 
 }
 
