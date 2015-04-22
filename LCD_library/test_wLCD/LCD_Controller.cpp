@@ -141,7 +141,6 @@ void draw_axis_control(int axis){
           case 2: u8g.drawStr(MENU_INDENT, 0, "Y AXIS ADJUST"); break;
           case 3: u8g.drawStr(MENU_INDENT, 0, "Z AXIS ADJUST"); break;
         }
-	//u8g.drawStr(MENU_INDENT, 0, header); // value of current selected axis
 	u8g.drawStr(MENU_INDENT, MENU_HEIGHT, "USE CONTROL STICK TO");
 	u8g.drawStr(MENU_INDENT, 2*MENU_HEIGHT, "ADJUST MOTOR"); //needs motor name/axis
 	u8g.drawStr(MENU_INDENT, 4*MENU_HEIGHT, "FWD TO ACCEPT");
@@ -151,7 +150,48 @@ void draw_axis_control(int axis){
 }
 
 void draw_settings(){
-	u8g.drawStr(MENU_INDENT, MENU_HEIGHT, "SETTINGS HOLDER");
+	u8g.drawStr(0, MENU_HEIGHT, "SETTINGS HOLDER");
+    u8g.drawStr(0, 2*MENU_HEIGHT, "Save Each Change with FWD");
+    u8g.drawStr(0, 3*MENU_HEIGHT, "Use L/R to adjust");
+    
+    //Determine which color option to display.
+    if ( cur_selection == 80 ){
+        switch( set_selection + color_set ){
+            case 1: u8g.drawStr(MENU_INDENT, 4*MENU_HEIGHT, "Display Color [ Blue   ]"); break;
+            case 2: u8g.drawStr(MENU_INDENT, 4*MENU_HEIGHT, "Display Color [ Green  ]"); break;
+            case 3: u8g.drawStr(MENU_INDENT, 4*MENU_HEIGHT, "Display Color [ Red    ]"); break;
+            case 4: u8g.drawStr(MENU_INDENT, 4*MENU_HEIGHT, "Display Color [ Orange ]"); break;
+            case 5: u8g.drawStr(MENU_INDENT, 4*MENU_HEIGHT, "Display Color [ Purple ]"); break;
+
+        }
+    }else{
+        switch( color_set ){
+            case 1: u8g.drawStr(MENU_INDENT, 4*MENU_HEIGHT, "Display Color [ Blue   ]"); break;
+            case 2: u8g.drawStr(MENU_INDENT, 4*MENU_HEIGHT, "Display Color [ Green  ]"); break;
+            case 3: u8g.drawStr(MENU_INDENT, 4*MENU_HEIGHT, "Display Color [ Red    ]"); break;
+            case 4: u8g.drawStr(MENU_INDENT, 4*MENU_HEIGHT, "Display Color [ Orange ]"); break;
+            case 5: u8g.drawStr(MENU_INDENT, 4*MENU_HEIGHT, "Display Color [ Purple ]"); break;
+
+        }
+    }
+
+    //Determine which cursor option to display.
+    if ( cur_selection == 81 ){
+        switch( set_selection + cursor_set ){
+            case 1: u8g.drawStr(MENU_INDENT, 5*MENU_HEIGHT, "Cursor        [    >   ]"); break;
+            case 2: u8g.drawStr(MENU_INDENT, 5*MENU_HEIGHT, "Cursor        [        ]");
+                    u8g.drawBitmapP( 3*MENU_INDENT, 5*MENU_HEIGHT, MENU_HEIGHT, paw_bitmap);
+                    break;
+        }
+    }else{
+        switch( cursor_set ){
+            case 1: u8g.drawStr(MENU_INDENT, 5*MENU_HEIGHT, "Cursor        [    >   ]"); break;
+            case 2: u8g.drawStr(MENU_INDENT, 5*MENU_HEIGHT, "Cursor        [        ]"); 
+                    u8g.drawBitmapP( 3*MENU_INDENT, 5*MENU_HEIGHT, MENU_HEIGHT, paw_bitmap);
+                    break;
+        }
+    }
+
 }
 
 void fwd_butt_handler(){
@@ -178,38 +218,33 @@ void bck_butt_handler(){
 
 
 void joystick_handler(){
+    //Read the two potentiometer values for the joystick
     int x = analogRead(JS_X);
     int y = analogRead(JS_Y);
-    //int fwd = analogRead(FWD_BUTT);
-    //int bck = analogRead(BCK_BUTT);
-    //Serial.println(y);
     
-    // if(fwd >= 1020){
-    //   next_move = cur_selection;
-    //   Serial.println("FWD");
-    // }else if(bck >= 1020){
-    //   next_move = 0;
-    //   Serial.println("BCK");
-    // }else{
-      if( x >= JS_RIGHT ){
-         // Serial.println("Right");
-      }else if( x <= JS_LEFT ){
-          //Serial.println("Left");
-      }else if( y >= JS_UP ){
-          if(cur_selection - 1 < cur_sel_min){
-              cur_selection = cur_sel_max;
-          }else{
-              cur_selection = cur_selection - 1;
-          }
-      
+    //Determine which direction was selected.
+    //Left and right are only enabled on apropriate screens,
+    //like Settings or Axis Adjust screens. 
+
+    if( enable_side_scroll && x >= JS_RIGHT ){
+         set_selection++;
+    }else if( enable_side_scroll && x <= JS_LEFT ){
+          set_selection--;
+    }else if( y >= JS_UP ){
+        if(cur_selection - 1 < cur_sel_min){
+            cur_selection = cur_sel_max;
+        }else{
+            cur_selection = cur_selection - 1;
+        }
         while( analogRead(JS_Y) >= JS_UP );
-      }else if( y <= JS_DOWN ){
-          if(cur_selection+1 > cur_sel_max){
-              cur_selection = cur_sel_min;
-          }else{
-              cur_selection = cur_selection + 1;
-          }
-          while( analogRead(JS_Y) <= JS_DOWN );
+
+    }else if( y <= JS_DOWN ){
+        if(cur_selection+1 > cur_sel_max){
+            cur_selection = cur_sel_min;
+        }else{
+            cur_selection = cur_selection + 1;
+        }
+        while( analogRead(JS_Y) <= JS_DOWN );
       }
    // }
     Serial.println(cur_selection);
