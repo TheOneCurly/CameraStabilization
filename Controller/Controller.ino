@@ -50,7 +50,7 @@ customPWM motorPinz(PWM_pin_z);
 IMUController imu(0);
 IMUController imu_error(1);
 
-int* duty = (int*) malloc(3*sizeof(int));
+int* duty;
 float* angle_values = (float*) malloc(3*sizeof(float));
 float* error_angle_values = (float*) malloc(3*sizeof(float));
 float* angle_values_init = (float*) malloc(3*sizeof(float));
@@ -96,10 +96,11 @@ void setup() {
     attachInterrupt(0, dmp0DataReady, RISING);
     attachInterrupt(1, dmp1DataReady, RISING);
     
-    imu.init();
-    imu_error.init();
     bool imu_ready = false;
     bool imu_error_ready = false;
+    
+    imu.init();
+    imu_error.init();
     
     imu.poll(angle_values);
     imu_error.poll(error_angle_values);
@@ -161,20 +162,24 @@ void loop() {
       duty = PIDMovementCalc_withError(angle_values, error_angle_values);
       
      // debug
-      Serial.println(duty[0]);
-      Serial.println(duty[1]);
+      Serial.print(F("duty cycles: \t"));                               
+      Serial.print(duty[0]);
+      Serial.print(F("\t"));
+      Serial.print(duty[1]);
+      Serial.print(F("\t"));
       Serial.println(duty[2]);
+      Serial.println(F(""));
       
       //set duty cycles
       motorPinx.duty(duty[0]);
       motorPiny.duty(duty[1]);
       motorPinz.duty(duty[2]);
       
-      //free(duty);
+      free(duty);
       //repeat
     }
     else{
-      Serial.println("ignoring duty calc because of fifo overflow");
+      Serial.println(F("Ignoring duty calculations because of fifo overflow."));
     }
 }
 

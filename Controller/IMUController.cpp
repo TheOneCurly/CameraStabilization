@@ -222,12 +222,12 @@ bool IMUController::poll(float* angle_values){
             }else{
               #ifdef DEBUG
                 Serial.print(interruptNum);
-//                Serial.print("\t ypr\t");
-//                Serial.print(ypr_avg[0] * 180/(AVERAGE_COUNT*M_PI));
-//                Serial.print("\t");
-//                Serial.print(ypr_avg[1] * 180/(AVERAGE_COUNT*M_PI));
-//                Serial.print("\t");
-//                Serial.println(ypr_avg[2] * 180/(AVERAGE_COUNT*M_PI));
+                Serial.print(F("\t ypr\t"));
+                Serial.print(ypr_avg[0] * 180/(AVERAGE_COUNT*M_PI));
+                Serial.print(F("\t"));
+                Serial.print(ypr_avg[1] * 180/(AVERAGE_COUNT*M_PI));
+                Serial.print(F("\t"));
+                Serial.println(ypr_avg[2] * 180/(AVERAGE_COUNT*M_PI));
               #endif
   
               ypr_avg[0] = ypr_avg[0] * 180/(AVERAGE_COUNT*M_PI);
