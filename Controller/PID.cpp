@@ -135,8 +135,8 @@ int* PIDMovementCalc_withError(float* angles, float* errorAngles){
 //        dutyCycles[0] = kp*xError + ki*xErrorSum;
         xDuty = kp*xError + ki*xErrorSum;
         //Serial.println(xDuty);
-        xDuty = constrain(xDuty, -150, 150);
-        dutyCycles[0] = map(xDuty, -150, 150, 0, 100);
+        xDuty = constrain(xDuty, -100, 100);
+        dutyCycles[0] = map(xDuty, -100, 100, 0, 100);
     }else{
         dutyCycles[0] = 50;
     }
@@ -145,8 +145,8 @@ int* PIDMovementCalc_withError(float* angles, float* errorAngles){
     if(Y_control_en){
 //        dutyCycles[1] = kp*yControl + ki*yControl*(t - t_last) + kp*yError + ki*yError*(t - t_last);
         yDuty = kp*yError+ ki*yErrorSum;
-        yDuty = constrain(dutyCycles[1], -100, 100);
-        dutyCycles[1] = map(dutyCycles[1], -100, 100, 0, 100);
+        yDuty = constrain(yDuty, -100, 100);
+        dutyCycles[1] = map(yDuty, -100, 100, 0, 100);
     }else{
         dutyCycles[1] = 50;
     }
@@ -155,8 +155,8 @@ int* PIDMovementCalc_withError(float* angles, float* errorAngles){
     if(Z_control_en){
  //       dutyCycles[2] = kp*zControl + ki*zControl*(t - t_last) + kp*zError + ki*zError*(t - t_last);
         zDuty = kp*zError+ ki*zErrorSum;
-        zDuty = constrain(dutyCycles[2], -100, 100);
-        dutyCycles[2] = map(dutyCycles[2], -100, 100, 0, 100);
+        zDuty = constrain(zDuty, -100, 100);
+        dutyCycles[2] = map(zDuty, -100, 100, 0, 100);
         
     }else{
         dutyCycles[2] = 50;

@@ -101,17 +101,17 @@ void setup() {
     
     bool imu_ready = false;
     bool imu_error_ready = false;
-    
-    imu.init();
-    imu_error.init();
-    
-    imu.poll(angle_values);
-    imu_error.poll(error_angle_values);
-    
     bool imu_valid = false;
     bool imu_error_valid = false;
     
+    imu.init();
+    imu.poll(angle_values);
+    
+    imu_error.init();
+    imu_error.poll(error_angle_values);
+    
     while(!imu_ready || !imu_error_ready){
+      delay(15); // needs small delay for init DO NOT REMOVE >:( 
       imu_valid = false;
       imu_error_valid = false;
       angle_values_init[0] = angle_values[0];
