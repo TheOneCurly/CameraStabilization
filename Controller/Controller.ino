@@ -17,6 +17,9 @@
 const float ANGLE_INIT_THRESHOLD = 0.2;
 
 // declare pins
+const int imu0Interrupt = 0;
+const int imu1Interrupt = 1;
+
 const int PWM_pin_x = 34;
 const int brake_x = 6;
 const int enable_x = 9;
@@ -50,6 +53,8 @@ customPWM motorPinz(PWM_pin_z);
 IMUController imu(0);
 IMUController imu_error(1);
 
+#include "LCD_Controller.h"
+
 int* duty;
 float* angle_values = (float*) malloc(3*sizeof(float));
 float* error_angle_values = (float*) malloc(3*sizeof(float));
@@ -73,6 +78,7 @@ void dmp1DataReady() {
 
 void setup() {
     Serial.begin(115200);
+    initialize_LCD();
     
     // Set pin modes
     pinMode(brake_x, OUTPUT);
@@ -93,8 +99,15 @@ void setup() {
     digitalWrite(enable_y, LOW);
     digitalWrite(enable_z, LOW);
     
-    attachInterrupt(0, dmp0DataReady, RISING);
-    attachInterrupt(1, dmp1DataReady, RISING);
+    attachInterrupt(imu0Interrupt, dmp0DataReady, RISING);
+    attachInterrupt(imu1Interrupt, dmp1DataReady, RISING);
+    
+    //attachInterrupt(JS_X, joystick_handler, );
+    //attachInterrupt(JS_Y, joystick_handler, );
+    
+    attachInterrupt(FWD_BUTT, fwd_butt_handler, RISING);
+    attachInterrupt(BCK_BUTT, bck_butt_handler, RISING);
+        
     
     bool imu_ready = false;
     bool imu_error_ready = false;
