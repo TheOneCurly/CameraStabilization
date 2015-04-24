@@ -96,8 +96,8 @@ void setup() {
     digitalWrite(enable_y, LOW);
     digitalWrite(enable_z, LOW);
     
-    attachInterrupt(0, dmp0DataReady, RISING);
-    attachInterrupt(1, dmp1DataReady, RISING);
+    attachInterrupt(IMU0Interrupt, dmp0DataReady, RISING);
+    attachInterrupt(IMU1Interrupt, dmp1DataReady, RISING);
     
     bool imu_ready = false;
     bool imu_error_ready = false;
