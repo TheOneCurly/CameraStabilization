@@ -43,6 +43,10 @@ static int system_weight = 800;
 static int system_power = 100;
 static int system_performance = 100;
 
+float xError, yError, zError;
+float xErrorSum = 0, yErrorSum = 0, zErrorSum = 0;
+float xDuty, yDuty, zDuty;
+
 static float kp = 1;
 static float ki = 1;
 static int t_last = 0;
@@ -107,10 +111,7 @@ int* PIDMovementCalc_withError(float* angles, float* errorAngles){
     int* dutyCycles = (int*)malloc(3*sizeof(int));
     
     float xControl, yControl, zControl;
-    float xError, yError, zError;
-    
-    float xDuty, yDuty, zDuty;
-    int t = millis();
+    int t = millis()/1000;
     
     // Main IMU error
     xControl = (angles[0] - baseAngles[0]);
@@ -123,13 +124,16 @@ int* PIDMovementCalc_withError(float* angles, float* errorAngles){
     yError = yControl/(yControl - (errorAngles[1] - errorBaseAngles[1]));
     zError = zControl/(zControl - (errorAngles[2] - errorBaseAngles[2]));
     
+    xErrorSum += xError*(t-t_last);
+    yErrorSum += yError*(t-t_last);
+    zErrorSum += zError*(t-t_last);
     //Serial.println(xControl);
     //Serial.println((errorAngles[0] - errorBaseAngles[0]));
     
     // X-axis
     if(X_control_en){
-//        dutyCycles[0] = kp*xControl + ki*xControl*(t - t_last) + kp*xError + ki*xError*(t - t_last);
-        xDuty = kp*xError;
+//        dutyCycles[0] = kp*xError + ki*xErrorSum;
+        xDuty = kp*xError + ki*xErrorSum;
         //Serial.println(xDuty);
         xDuty = constrain(xDuty, -150, 150);
         dutyCycles[0] = map(xDuty, -150, 150, 0, 100);
@@ -140,8 +144,8 @@ int* PIDMovementCalc_withError(float* angles, float* errorAngles){
     // Y-axis
     if(Y_control_en){
 //        dutyCycles[1] = kp*yControl + ki*yControl*(t - t_last) + kp*yError + ki*yError*(t - t_last);
-        dutyCycles[1] = kp*yError;
-        dutyCycles[1] = constrain(dutyCycles[1], -100, 100);
+        yDuty = kp*yError+ ki*yErrorSum;
+        yDuty = constrain(dutyCycles[1], -100, 100);
         dutyCycles[1] = map(dutyCycles[1], -100, 100, 0, 100);
     }else{
         dutyCycles[1] = 50;
@@ -150,8 +154,8 @@ int* PIDMovementCalc_withError(float* angles, float* errorAngles){
     // Z-axis
     if(Z_control_en){
  //       dutyCycles[2] = kp*zControl + ki*zControl*(t - t_last) + kp*zError + ki*zError*(t - t_last);
-        dutyCycles[2] = kp*zError;
-        dutyCycles[2] = constrain(dutyCycles[2], -100, 100);
+        zDuty = kp*zError+ ki*zErrorSum;
+        zDuty = constrain(dutyCycles[2], -100, 100);
         dutyCycles[2] = map(dutyCycles[2], -100, 100, 0, 100);
         
     }else{

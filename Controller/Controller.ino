@@ -17,17 +17,20 @@
 const float ANGLE_INIT_THRESHOLD = 0.2;
 
 // declare pins
-const int PWM_pin_x = 34;
-const int brake_x = 6;
-const int enable_x = 9;
+const int PWM_pin_x = 7;
+const int brake_x = 3;
+const int enable_x = 2;
 
-const int PWM_pin_y = 36;
-const int brake_y = 7;
-const int enable_y = 10;
+const int PWM_pin_y = 8;
+const int brake_y = 5;
+const int enable_y = 4;
 
-const int PWM_pin_z = 38;
-const int brake_z = 8;
-const int enable_z = 11;
+const int PWM_pin_z = 9;
+const int brake_z = 10;
+const int enable_z = 6;
+
+const int IMU0Interrupt = 48;
+const int IMU1Interrupt = 50;
 
 bool base_imu_flag;
 bool error_imu_flag;
