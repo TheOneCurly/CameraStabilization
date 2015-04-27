@@ -22,10 +22,10 @@
 
 //--------------------------------- LED PIN VALUES ---------------------------------\\
 // -- All are connected to digital pins so you can turn them off and on
-#define BACKLIGHT_LED 52
-#define BLUE_LED 51
-#define GREEN_LED 49
-#define RED_LED 47
+#define BACKLIGHT_LED 36
+#define BLUE_LED 40
+#define GREEN_LED 38
+#define RED_LED 34
 
 //-------------------------------- MENU INDEX VALUES --------------------------------\\
     
@@ -78,7 +78,7 @@ static int cur_axis = 0;
 static int next_move = 0;
 
 static int enable_side_scroll = 0;
-static int set_selection = 0;
+static int set_selection = 1;
 
 // System Settings Defaults 
 static int color_set = 2; //Green
@@ -86,14 +86,14 @@ static int cursor_set = 2;
 
 
 const uint8_t paw_bitmap[] PROGMEM = {
-  0x00,         // 00000000 
-  0x28,         // 00101000
-  0x28,         // 00101000
-  0x82,         // 10000010
-  0x92,         // 10010010
-  0x38,         // 00111000
-  0x38,         // 00111000 
-  0x28          // 00101000
+  0x00,         // 0 0 0 0 0 0 0 0 
+  0x28,         // 0 0 1 0 1 0 0 0
+  0x28,         // 0 0 1 0 1 0 0 0
+  0x82,         // 1 0 0 0 0 0 1 0
+  0x92,         // 1 0 0 1 0 0 1 0
+  0x38,         // 0 0 1 1 1 0 0 0
+  0x38,         // 0 0 1 1 1 0 0 0 
+  0x28          // 0 0 1 0 1 0 0 0
 };
 
 //-----------------------------------------------------------------------------------\\
@@ -102,6 +102,7 @@ void initialize_LCD();
 void LCD_movement_handler();
 void respond_to_action();
 void u8g_prepare();
+void draw_cursor(int cur_menu_index);
 void draw_home( int cur_menu_index );
 void draw_sys( int cur_menu_index );
 void draw_axis_select( int cur_menu_index );
@@ -116,6 +117,7 @@ void bck_butt_handler();
 
 void handle_select( int command );
 
+void set_UI_color(int new_color);
 // CONTROL FUNCTIONS
 void unlock_axis( int axis );
 void reset_axis( int axis );
