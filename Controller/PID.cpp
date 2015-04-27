@@ -14,6 +14,7 @@
 
 /***************************** Include Files *********************************/
 
+#include "Variables.h"
 #include "PID.h"
 
 /************************** Constant Definitions *****************************/
@@ -24,10 +25,6 @@
 //For each of the following enables:
 //	True means the axis is stabilized
 //	False means the axis is free floating. 
-static bool X_control_en = true;
-static bool Y_control_en = true;
-static bool Z_control_en = true;
-
 float baseAngles[3];
 float errorBaseAngles[3];
 
@@ -43,8 +40,11 @@ static int system_weight = 800;
 static int system_power = 100;
 static int system_performance = 100;
 
+float xErrorSum = 0, yErrorSum = 0, zErrorSum = 0;
+
 static float kp = 1;
 static float ki = 1;
+int t = 0;
 static int t_last = 0;
 /**
  *
@@ -105,12 +105,7 @@ int* PIDMovementCalc(float* angles){
  ******************************************************************************/
 int* PIDMovementCalc_withError(float* angles, float* errorAngles){
     int* dutyCycles = (int*)malloc(3*sizeof(int));
-    
-    float xControl, yControl, zControl;
-    float xError, yError, zError;
-    
-    float xDuty, yDuty, zDuty;
-    int t = millis();
+    t = millis()/1000;
     
     // Main IMU error
     xControl = (angles[0] - baseAngles[0]);
@@ -118,42 +113,52 @@ int* PIDMovementCalc_withError(float* angles, float* errorAngles){
     zControl = (angles[2] - baseAngles[2]);
     
     // Error IMU error
-    xError = xControl/(xControl - (errorAngles[0] - errorBaseAngles[0]));
-//    Serial.println(xError);
-    yError = yControl/(yControl - (errorAngles[1] - errorBaseAngles[1]));
-    zError = zControl/(zControl - (errorAngles[2] - errorBaseAngles[2]));
+    xError = (errorAngles[0] - errorBaseAngles[0]);
+    yError = (errorAngles[1] - errorBaseAngles[1]);
+    zError = (errorAngles[2] - errorBaseAngles[2]);
     
-    //Serial.println(xControl);
-    //Serial.println((errorAngles[0] - errorBaseAngles[0]));
+    xErrorSum += xError*(t-t_last);
+    yErrorSum += yError*(t-t_last);
+    zErrorSum += zError*(t-t_last);
     
     // X-axis
-    if(X_control_en){
-//        dutyCycles[0] = kp*xControl + ki*xControl*(t - t_last) + kp*xError + ki*xError*(t - t_last);
+    if(X_control_en && xControl < 10 && xControl > -10 && xError < 160 && xError > -160){
+        xDuty = kp*xError + ki*xErrorSum;
+        xDuty = constrain(xDuty, -100, 100);
+        dutyCycles[0] = map(xDuty, -100, 100, 0, 100);
+    }else if(!X_control_en){
+        xError = (angles[0] - baseAngles[0]) - (errorAngles[0] - errorBaseAngles[0]);
         xDuty = kp*xError;
-        //Serial.println(xDuty);
-        xDuty = constrain(xDuty, -150, 150);
-        dutyCycles[0] = map(xDuty, -150, 150, 0, 100);
+        xDuty = constrain(xDuty, -100, 100);
+        dutyCycles[0] = map(xDuty, -100, 100, 0, 100);
     }else{
         dutyCycles[0] = 50;
     }
     
     // Y-axis
-    if(Y_control_en){
-//        dutyCycles[1] = kp*yControl + ki*yControl*(t - t_last) + kp*yError + ki*yError*(t - t_last);
-        dutyCycles[1] = kp*yError;
-        dutyCycles[1] = constrain(dutyCycles[1], -100, 100);
-        dutyCycles[1] = map(dutyCycles[1], -100, 100, 0, 100);
+    if(Y_control_en && yControl < 10 && yControl > -10 && yError < 160 && yError > -160){
+        yDuty = kp*yError+ ki*yErrorSum;
+        yDuty = constrain(yDuty, -100, 100);
+        dutyCycles[1] = map(yDuty, -100, 100, 0, 100);
+    }else if(!Y_control_en){
+        yError = (angles[1] - baseAngles[1]) - (errorAngles[1] - errorBaseAngles[1]);
+        yDuty = kp*yError;
+        yDuty = constrain(yDuty, -100, 100);
+        dutyCycles[1] = map(yDuty, -100, 100, 0, 100);
     }else{
         dutyCycles[1] = 50;
     }
     
     // Z-axis
-    if(Z_control_en){
- //       dutyCycles[2] = kp*zControl + ki*zControl*(t - t_last) + kp*zError + ki*zError*(t - t_last);
-        dutyCycles[2] = kp*zError;
-        dutyCycles[2] = constrain(dutyCycles[2], -100, 100);
-        dutyCycles[2] = map(dutyCycles[2], -100, 100, 0, 100);
-        
+    if(Z_control_en && zControl < 10 && zControl > -10 && zError < 50 && zError > -50){
+        zDuty = kp*zError+ ki*zErrorSum;
+        zDuty = constrain(zDuty, -100, 100);
+        dutyCycles[2] = map(zDuty, -100, 100, 0, 100);
+    }else if(!Z_control_en){
+        zError = (angles[2] - baseAngles[2]) - (errorAngles[2] - errorBaseAngles[2]);
+        zDuty = kp*zError;
+        zDuty = constrain(zDuty, -100, 100);
+        dutyCycles[2] = map(zDuty, -100, 100, 0, 100);
     }else{
         dutyCycles[2] = 50;
     }

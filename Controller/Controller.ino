@@ -17,20 +17,21 @@
 const float ANGLE_INIT_THRESHOLD = 0.2;
 
 // declare pins
-const int imu0Interrupt = 0;
-const int imu1Interrupt = 1;
+const int PWM_pin_x = 7;
+const int brake_x = 3;
+const int enable_x = 2;
 
-const int PWM_pin_x = 34;
-const int brake_x = 6;
-const int enable_x = 9;
 
-const int PWM_pin_y = 36;
-const int brake_y = 7;
-const int enable_y = 10;
+const int PWM_pin_y = 8;
+const int brake_y = 5;
+const int enable_y = 4;
 
-const int PWM_pin_z = 38;
-const int brake_z = 8;
-const int enable_z = 11;
+const int PWM_pin_z = 9;
+const int brake_z = 10;
+const int enable_z = 6;
+
+const int IMU0Interrupt = 48;
+const int IMU1Interrupt = 50;
 
 bool base_imu_flag;
 bool error_imu_flag;
@@ -99,29 +100,23 @@ void setup() {
     digitalWrite(enable_y, LOW);
     digitalWrite(enable_z, LOW);
     
-    attachInterrupt(imu0Interrupt, dmp0DataReady, RISING);
-    attachInterrupt(imu1Interrupt, dmp1DataReady, RISING);
-    
-    //attachInterrupt(JS_X, joystick_handler, );
-    //attachInterrupt(JS_Y, joystick_handler, );
-    
-    attachInterrupt(FWD_BUTT, fwd_butt_handler, RISING);
-    attachInterrupt(BCK_BUTT, bck_butt_handler, RISING);
-        
+    attachInterrupt(IMU0Interrupt, dmp0DataReady, RISING);
+    attachInterrupt(IMU1Interrupt, dmp1DataReady, RISING);
+
     
     bool imu_ready = false;
     bool imu_error_ready = false;
-    
-    imu.init();
-    imu_error.init();
-    
-    imu.poll(angle_values);
-    imu_error.poll(error_angle_values);
-    
     bool imu_valid = false;
     bool imu_error_valid = false;
     
+    imu.init();
+    imu.poll(angle_values);
+    
+    imu_error.init();
+    imu_error.poll(error_angle_values);
+    
     while(!imu_ready || !imu_error_ready){
+      delay(15); // needs small delay for init DO NOT REMOVE >:( 
       imu_valid = false;
       imu_error_valid = false;
       angle_values_init[0] = angle_values[0];
