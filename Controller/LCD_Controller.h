@@ -100,28 +100,21 @@ const uint8_t paw_bitmap[] PROGMEM = {
 
 void initialize_LCD();
 void LCD_movement_handler();
-void respond_to_action();
 void u8g_prepare();
 void draw_cursor(int cur_menu_index);
 void draw_home( int cur_menu_index );
-void draw_sys( int cur_menu_index );
+void draw_sys();
 void draw_axis_select( int cur_menu_index );
-void draw_axis_options( int cur_menu_index, int axis);
-void draw_axis_control( int axis );
-void draw_settings();
+void draw_settings( int cur_menu_index );
 void draw();
-void handle_menu_context();
 void joystick_handler();
 void fwd_butt_handler();
 void bck_butt_handler();
 
 void handle_select( int command );
 
-void set_UI_color(int new_color);
 // CONTROL FUNCTIONS
 void unlock_axis( int axis );
-void reset_axis( int axis );
-void adjust_axis( int axis, int adjust );
 
 void set_background_color(int color);
 
