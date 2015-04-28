@@ -52,6 +52,8 @@ void initialize_LCD(){
   cur_sel_min = HOME_BASE;
   cur_sel_max = HOME_MAX;
   next_move = -1;
+  
+  LCD_movement_handler();
 }
 
 void LCD_movement_handler(){
