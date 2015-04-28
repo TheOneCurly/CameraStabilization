@@ -59,7 +59,6 @@ IMUController imu(0);
 IMUController imu_error(1);
 
 #include "LCD_Controller.h"
-#include "Variables.h"
 
 int* duty;
 float* angle_values = (float*) malloc(3*sizeof(float));
@@ -167,7 +166,7 @@ void setup() {
       }
     }
     
-    IMUReady = true;
+    sys_init_complete();
     
     // Enable movement
     digitalWrite(enable_x, HIGH);
