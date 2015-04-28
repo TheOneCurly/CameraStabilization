@@ -46,10 +46,8 @@ const int AVERAGE_COUNT = 6;
  ******************************************************************************/
   IMUController::IMUController (int addr){
       if(addr == 0){
-          interruptNum = 0;
           mpu = MPU6050(0x68);
       }else{
-          interruptNum = 1;
           mpu = MPU6050(0x69);
       }
   }
@@ -91,16 +89,14 @@ const int AVERAGE_COUNT = 6;
  ******************************************************************************/
 bool IMUController::poll(float* angle_values){
     ypr_count = 0;
-    int16_t ax, ay, az;
-    int16_t gx, gy, gz;
     mpu.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
     Serial.print("a/g:\t");
-        Serial.print(ax); Serial.print("\t");
-        Serial.print(ay); Serial.print("\t");
-        Serial.print(az); Serial.print("\t");
-        Serial.print(gx); Serial.print("\t");
-        Serial.print(gy); Serial.print("\t");
-        Serial.println(gz);
+    Serial.print(ax); Serial.print("\t");
+    Serial.print(ay); Serial.print("\t");
+    Serial.print(az); Serial.print("\t");
+    Serial.print(gx); Serial.print("\t");
+    Serial.print(gy); Serial.print("\t");
+    Serial.println(gz);
     
 //            if (ypr_count < AVERAGE_COUNT) {
 //              ypr_avg[0] += ypr[0];
