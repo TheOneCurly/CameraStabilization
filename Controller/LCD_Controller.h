@@ -107,8 +107,11 @@ const uint8_t paw_bitmap[] PROGMEM = {
 
 void initialize_LCD();
 void LCD_movement_handler();
+void sys_init_complete();
 void u8g_prepare();
+
 void draw_cursor(int cur_menu_index);
+void draw_init();
 void draw_home( int cur_menu_index );
 void draw_sys();
 void draw_axis_select( int cur_menu_index );

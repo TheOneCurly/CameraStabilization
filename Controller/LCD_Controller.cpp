@@ -45,14 +45,22 @@ void initialize_LCD(){
 	//Set Background Color to default selection
 	set_background_color(color_set);
 
-  next_menu_page = 1;
-  parent_menu_page = 1;
+  next_menu_page = 0;
+  parent_menu_page = 0;
   cur_selection = HOME_BASE;
-  cur_menu_page = 1;
+  cur_menu_page = 0;
   cur_sel_min = HOME_BASE;
   cur_sel_max = HOME_MAX;
   next_move = -1;
   
+  LCD_movement_handler();
+}
+
+void sys_init_complete(){
+  next_menu_page = 1;
+  parent_menu_page = 1;
+  cur_menu_page = 1;
+
   LCD_movement_handler();
 }
 
@@ -95,6 +103,13 @@ void draw_cursor(int cur_menu_index){
             case 3: u8g.drawBitmapP(0, cur_menu_index*MENU_HEIGHT, 1,  MENU_HEIGHT, paw_bitmap); break;
         }
 }
+
+void draw_init(){
+  u8g.drawStr(2*MENU_INDENT, 3*MENU_HEIGHT, "SYSTEM INITIALIZING");
+  u8g.drawStr(2*MENU_INDENT, 4*MENU_HEIGHT, "PLEASE HOLD STILL");
+
+}
+
 
 void draw_home( int cur_menu_index ){
   draw_cursor(cur_menu_index + 1);
@@ -194,6 +209,8 @@ void draw_settings( int cur_menu_index ){
 void draw(){
   u8g_prepare();
   switch( cur_menu_page ) {
+    case 0: draw_init(); break;
+
     case 1: draw_home(cur_selection); break;
             
     case 2: draw_sys(); break;
