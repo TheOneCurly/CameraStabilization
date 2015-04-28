@@ -14,9 +14,6 @@
 #define _VARIABLES_H_
 
 #include "Arduino.h"
-
-        static bool IMUReady = false;
-
 	static bool X_control_en = true;
 	static bool Y_control_en = true;
 	static bool Z_control_en = true;
