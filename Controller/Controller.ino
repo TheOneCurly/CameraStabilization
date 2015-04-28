@@ -118,11 +118,11 @@ void setup() {
     attachInterrupt(IMU0Interrupt, dmp0DataReady, RISING);
     attachInterrupt(IMU1Interrupt, dmp1DataReady, RISING);
     
-//    attachInterrupt(FWD_BUTT, fwd_butt_handler, RISING);
-//    attachInterrupt(BCK_BUTT, bck_butt_handler, RISING);
-//    
-//    attachInterrupt(JS_X, joystick_handler, CHANGE);
-//    attachInterrupt(JS_Y, joystick_handler, CHANGE);
+    attachInterrupt(FWD_BUTT, fwd_butt_handler, HIGH);
+    attachInterrupt(BCK_BUTT, bck_butt_handler, HIGH);
+    
+    attachInterrupt(JS_X, joystick_handler, HIGH);
+    attachInterrupt(JS_Y, joystick_handler, HIGH);
 
 
     
