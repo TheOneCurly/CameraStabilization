@@ -18,6 +18,7 @@
 
 #include <U8glib.h>
 #include "Arduino.h"
+#include "Variables.h"
 
 
 //--------------------------------- LED PIN VALUES ---------------------------------\\

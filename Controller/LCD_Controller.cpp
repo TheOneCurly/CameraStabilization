@@ -12,7 +12,7 @@
  *
  */
 
-
+#include <U8glib.h>
 #include "Arduino.h"
 #include "LCD_Controller.h"
 
@@ -42,7 +42,7 @@ void initialize_LCD(){
 	pinMode(RED_LED, OUTPUT);
 
 	//Set Background Color to default selection
-	set_UI_color(color_set);
+	set_background_color(color_set);
 
   next_menu_page = 1;
   parent_menu_page = 1;
@@ -89,7 +89,7 @@ void u8g_prepare(){
 void draw_cursor(int cur_menu_index){
   switch( cursor_set ){
             case 2: u8g.drawStr(0, cur_menu_index*MENU_HEIGHT, ">"); break;
-            case 3: u8g.drawBitmapP(0, cur_menu_index*MENU_HEIGHT, MENU_HEIGHT, paw_bitmap); break;
+            case 3: u8g.drawBitmapP(0, cur_menu_index*MENU_HEIGHT, 1,  MENU_HEIGHT, paw_bitmap); break;
         }
 }
 
@@ -173,14 +173,14 @@ void draw_settings( int cur_menu_index ){
         switch( (set_selection % 2) + cursor_set ){
             case 2: u8g.drawStr(MENU_INDENT, 5*MENU_HEIGHT, "Cursor        [    >   ]"); break;
             case 3: u8g.drawStr(MENU_INDENT, 5*MENU_HEIGHT, "Cursor        [        ]");
-                    u8g.drawBitmapP( 3*MENU_INDENT, 5*MENU_HEIGHT, MENU_HEIGHT, paw_bitmap);
+                    u8g.drawBitmapP( 3*MENU_INDENT, 5*MENU_HEIGHT, 1, MENU_HEIGHT, paw_bitmap);
                     break;
         }
     }else{
         switch( cursor_set ){
             case 2: u8g.drawStr(MENU_INDENT, 5*MENU_HEIGHT, "Cursor        [    >   ]"); break;
             case 3: u8g.drawStr(MENU_INDENT, 5*MENU_HEIGHT, "Cursor        [        ]"); 
-                    u8g.drawBitmapP( 3*MENU_INDENT, 5*MENU_HEIGHT, MENU_HEIGHT, paw_bitmap);
+                    u8g.drawBitmapP( 3*MENU_INDENT, 5*MENU_HEIGHT, 1, MENU_HEIGHT, paw_bitmap);
                     break;
         }
     }
