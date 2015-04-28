@@ -44,16 +44,16 @@ const int AVERAGE_COUNT = 6;
  *                True - success
  *                False - Failure
  ******************************************************************************/
-  IMUController::IMUController (int addr){
-      if(addr == 0){
-          mpu = MPU6050(0x68);
-      }else{
-          mpu = MPU6050(0x69);
-      }
-  }
+IMUController::IMUController (int addr){
+    if(addr == 0){
+        mpu = MPU6050(0x68);
+    }else{
+        mpu = MPU6050(0x69);
+    }
+}
  
- bool IMUController::init(){
-        // join I2C bus (I2Cdev library doesn't do this automatically)
+bool IMUController::init(){
+    // join I2C bus (I2Cdev library doesn't do this automatically)
     #if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
         Wire.begin();
        // TWBR = 24; // 400kHz I2C clock (200kHz if CPU is 8MHz)
@@ -64,11 +64,11 @@ const int AVERAGE_COUNT = 6;
     // initialize device
     Serial.println(F("Initializing I2C devices..."));
     mpu.initialize();
-
+  
     // verify connection
     Serial.println(F("Testing device connections..."));
     Serial.println(mpu.testConnection() ? F("MPU6050 connection successful") : F("MPU6050 connection failed"));
-
+  
     //    // supply your own gyro offsets here, scaled for min sensitivity
     //    mpu.setXGyroOffset(220);
     //    mpu.setYGyroOffset(76);
@@ -88,7 +88,7 @@ const int AVERAGE_COUNT = 6;
  *                False - Failure
  ******************************************************************************/
 bool IMUController::poll(float* angle_values){
-    ypr_count = 0;
+    avg_count = 0;
     mpu.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
     Serial.print("a/g:\t");
     Serial.print(ax); Serial.print("\t");
@@ -98,35 +98,41 @@ bool IMUController::poll(float* angle_values){
     Serial.print(gy); Serial.print("\t");
     Serial.println(gz);
     
-//            if (ypr_count < AVERAGE_COUNT) {
-//              ypr_avg[0] += ypr[0];
-//              ypr_avg[1] += ypr[1];
-//              ypr_avg[2] += ypr[2];
-//              ypr_count ++;
-//            }else{
-//              #ifdef DEBUG
-//                Serial.print(interruptNum);
-//                Serial.print(F("\t ypr\t"));
-//                Serial.print(ypr_avg[0] * 180/(AVERAGE_COUNT*M_PI));
-//                Serial.print(F("\t"));
-//                Serial.print(ypr_avg[1] * 180/(AVERAGE_COUNT*M_PI));
-//                Serial.print(F("\t"));
-//                Serial.println(ypr_avg[2] * 180/(AVERAGE_COUNT*M_PI));
-//              #endif
-//  
-//              ypr_avg[0] = ypr_avg[0] * 180/(AVERAGE_COUNT*M_PI);
-//              ypr_avg[1] = ypr_avg[1] * 180/(AVERAGE_COUNT*M_PI);
-//              ypr_avg[2] = ypr_avg[2] * 180/(AVERAGE_COUNT*M_PI);
-//              
-//              angle_values[0] = ypr_avg[0];
-//              angle_values[1] = ypr_avg[1];
-//              angle_values[2] = ypr_avg[2];
-//              ypr_count = 0;
-//              ypr_avg[0] = 0;
-//              ypr_avg[1] = 0;
-//              ypr_avg[2] = 0;
-//              mpu.resetFIFO();       
-//              return true;           
+//    if (ypr_count < AVERAGE_COUNT) {
+//      ypr_avg[0] += ypr[0];
+//      ypr_avg[1] += ypr[1];
+//      ypr_avg[2] += ypr[2];
+//      ypr_count ++;
+//    }else{
+//      #ifdef DEBUG
+//        Serial.print(interruptNum);
+//        Serial.print(F("\t ypr\t"));
+//        Serial.print(ypr_avg[0] * 180/(AVERAGE_COUNT*M_PI));
+//        Serial.print(F("\t"));
+//        Serial.print(ypr_avg[1] * 180/(AVERAGE_COUNT*M_PI));
+//        Serial.print(F("\t"));
+//        Serial.println(ypr_avg[2] * 180/(AVERAGE_COUNT*M_PI));
+//      #endif
+//
+//      ypr_avg[0] = ypr_avg[0] * 180/(AVERAGE_COUNT*M_PI);
+//      ypr_avg[1] = ypr_avg[1] * 180/(AVERAGE_COUNT*M_PI);
+//      ypr_avg[2] = ypr_avg[2] * 180/(AVERAGE_COUNT*M_PI);
+//      
+//      angle_values[0] = ypr_avg[0];
+//      angle_values[1] = ypr_avg[1];
+//      angle_values[2] = ypr_avg[2];
+//      ypr_count = 0;
+//      ypr_avg[0] = 0;
+//      ypr_avg[1] = 0;
+//      ypr_avg[2] = 0;
+//      mpu.resetFIFO();       
+//      return true;   
+
+    // this is where the conditioning of the raw values will occur. 
+    // this should return 3 float angles
+    angle_values[0] = 50;
+    angle_values[1] = 50;
+    angle_values[2] = 50;
 }
 
 MPU6050* IMUController::getIMU(){

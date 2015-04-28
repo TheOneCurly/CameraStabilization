@@ -23,14 +23,12 @@ class IMUController{
         MPU6050* getIMU();
         
     private:   
-    // orientation/motion vars
-    float ypr[3];           // [yaw, pitch, roll]   yaw/pitch/roll container and gravity vector
-    
+    // orientation/motion vars   
     int16_t ax, ay, az;     // raw values from imu
     int16_t gx, gy, gz;
     
-    float ypr_avg[3];
-    int ypr_count = 0;
+    float angle_avg[3];
+    int avg_count = 0;
     MPU6050 mpu;
     
 };
