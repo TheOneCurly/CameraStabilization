@@ -69,15 +69,22 @@ bool IMUController::init(){
   
     // verify connection
     Serial.println(F("Testing device connections..."));
-    Serial.println(mpu.testConnection() ? F("MPU6050 connection successful") : F("MPU6050 connection failed"));
+    bool connection = mpu.testConnection();
+    
+    if(connection){
+      Serial.println(F("MPU6050 connection successful") );
+      return true;
+    }
+    else{
+      Serial.println(F("MPU6050 connection failed"));
+      return false;
+    }
   
     //    // supply your own gyro offsets here, scaled for min sensitivity
     //    mpu.setXGyroOffset(220);
     //    mpu.setYGyroOffset(76);
     //    mpu.setZGyroOffset(-85);
     //    mpu.setZAccelOffset(1788); // 1688 factory default for my test chip
-    
-    return true;
 }
 
 /**
@@ -134,6 +141,7 @@ bool IMUController::poll(float* angle_values){
 
     // this is where the conditioning of the raw values will occur. 
     // this should return 3 float angles
+    // maybe average 10 calculations?
     angle_values[0] = 50;
     angle_values[1] = 50;
     angle_values[2] = 50;
