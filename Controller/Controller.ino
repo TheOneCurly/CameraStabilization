@@ -59,6 +59,7 @@ IMUController imu(0);
 IMUController imu_error(1);
 
 #include "LCD_Controller.h"
+#include "Variables.h"
 
 int* duty;
 float* angle_values = (float*) malloc(3*sizeof(float));
@@ -85,6 +86,16 @@ void setup() {
     Serial.begin(115200);
     initialize_LCD();
     
+//    pinMode(FWD_BUTT, INPUT);
+//    pinMode(BCK_BUTT, INPUT);
+//    pinMode(JS_X, INPUT);
+//    pinMode(JS_Y, INPUT);
+//    
+//    digitalWrite(FWD_BUTT, HIGH);
+//    digitalWrite(BCK_BUTT, HIGH);
+//    digitalWrite(JS_X, HIGH);
+//    digitalWrite(JS_Y, HIGH);
+    
     // Set pin modes
     pinMode(brake_x, OUTPUT);
     pinMode(brake_y, OUTPUT);
@@ -106,6 +117,13 @@ void setup() {
     
     attachInterrupt(IMU0Interrupt, dmp0DataReady, RISING);
     attachInterrupt(IMU1Interrupt, dmp1DataReady, RISING);
+    
+//    attachInterrupt(FWD_BUTT, fwd_butt_handler, RISING);
+//    attachInterrupt(BCK_BUTT, bck_butt_handler, RISING);
+//    
+//    attachInterrupt(JS_X, joystick_handler, CHANGE);
+//    attachInterrupt(JS_Y, joystick_handler, CHANGE);
+
 
     
     bool imu_ready = false;
@@ -148,6 +166,8 @@ void setup() {
         }
       }
     }
+    
+    IMUReady = true;
     
     // Enable movement
     digitalWrite(enable_x, HIGH);

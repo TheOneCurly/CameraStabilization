@@ -210,6 +210,9 @@ void draw(){
 void bck_butt_handler(){
   int bck = analogRead(BCK_BUTT);
 
+    Serial.print("Back Butt\t");
+    Serial.println(bck);
+
   if( 0 == bck_butt_trig && bck >= 1000 ){
     bck_butt_trig = 1;
     next_move = 0;
@@ -221,6 +224,9 @@ void bck_butt_handler(){
 
 void fwd_butt_handler(){
   int fwd = analogRead(FWD_BUTT);
+  
+  Serial.print("Front Butt\t");
+  Serial.println(fwd);
   
   if(fwd_butt_trig == 0 && fwd>= 1000){
     fwd_butt_trig = 1;
@@ -238,6 +244,11 @@ void joystick_handler(){
     //Read the two potentiometer values for the joystick
     int x = analogRead(JS_X);
     int y = analogRead(JS_Y);
+    
+    Serial.print("JOYSTICK\t");
+    Serial.print(x);
+    Serial.print("\t");
+    Serial.println(y);
     
     //Determine which direction was selected.
     //Left and right are only enabled on apropriate screens,
