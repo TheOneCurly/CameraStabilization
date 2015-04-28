@@ -20,6 +20,12 @@
 #include "Arduino.h"
 #include "Variables.h"
 
+#define JS_X A3
+#define JS_Y A4
+#define FWD_BUTT A5
+#define BCK_BUTT A6
+
+
 
 //--------------------------------- LED PIN VALUES ---------------------------------\\
 // -- All are connected to digital pins so you can turn them off and on

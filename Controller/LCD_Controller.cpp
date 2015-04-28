@@ -19,11 +19,12 @@
 #define MENU_INDENT 8
 #define MENU_HEIGHT 9
 
-#define JS_X A3
-#define JS_Y A4
-#define FWD_BUTT A5
-#define BCK_BUTT A6
+//------------------------------ 'BOOL' FOR INTERRUPTS ------------------------------\\
 
+static int bck_butt_trig = 0;
+static int js_trig_x = 0;
+static int js_trig_y = 0;
+static int fwd_butt_trig = 0;
 //Initialize the LCD Display
 // pin 21 - Serial clock out (SCLK)
 // pin 18 - Serial data out (SID)
@@ -55,9 +56,9 @@ void initialize_LCD(){
 
 void LCD_movement_handler(){
   
-  joystick_handler();
-  fwd_butt_handler();
-  bck_butt_handler();
+  //joystick_handler();
+  //fwd_butt_handler();
+  //bck_butt_handler();
   if(next_move > 0){
     handle_select( cur_selection );
 
@@ -204,26 +205,31 @@ void draw(){
 }
 
 
-void fwd_butt_handler(){
-    int fwd = analogRead(FWD_BUTT);
-
-    if(fwd >= 1000){
-      next_move = cur_selection;
-      Serial.println("FWD");
-      while(analogRead(FWD_BUTT) >= 1020);
-    }
-}
-
-
 void bck_butt_handler(){
-    int bck = analogRead(BCK_BUTT);
+  int bck = analogRead(BCK_BUTT);
 
-    if(bck >= 1000){
-      next_move = 0;
-      Serial.println("BCK");
-      while(analogRead(BCK_BUTT) >= 1020);
-    }
+  if( 0 == bck_butt_trig && bck >= 1000 ){
+    bck_butt_trig = 1;
+    next_move = 0;
+    LCD_movement_handler();
+  }else if( bck_butt_trig && bck <= 1000 ){
+    bck_butt_trig = 0;
+  }
 }
+
+void fwd_butt_handler(){
+  int fwd = analogRead(FWD_BUTT);
+  
+  if(fwd_butt_trig == 0 && fwd>= 1000){
+    fwd_butt_trig = 1;
+    next_move = cur_selection;
+    LCD_movement_handler();
+  }else if( fwd_butt_trig && fwd <= 1000){
+    fwd_butt_trig = 0;
+  }
+}
+
+
 
 
 void joystick_handler(){
@@ -234,19 +240,25 @@ void joystick_handler(){
     //Determine which direction was selected.
     //Left and right are only enabled on apropriate screens,
     //like Settings or Axis Adjust screens. 
-
-    if( enable_side_scroll && x >= JS_RIGHT ){
-         set_selection++;
-    }else if( enable_side_scroll && x <= JS_LEFT ){
+  if ( 0 == js_trig_x && (x >= JS_RIGHT || x <= JS_LEFT) ){
+      if( enable_side_scroll && x >= JS_RIGHT ){
+           set_selection++;
+      }else if( enable_side_scroll && x <= JS_LEFT ){
           set_selection--;
+      }
 
-    }else if( y >= JS_UP ){
+      LCD_movement_handler();
+  }else if( js_trig_x && (x <= JS_RIGHT || x >= JS_LEFT) ){
+      js_trig_x = 0;
+  }
+
+  if ( 0 == js_trig_y && (y >= JS_UP || y<= JS_DOWN) ){
+    if( y >= JS_UP ){
         if(cur_selection - 1 < cur_sel_min){
             cur_selection = cur_sel_max;
         }else{
             cur_selection = cur_selection - 1;
         }
-        while( analogRead(JS_Y) >= JS_UP );
 
     }else if( y <= JS_DOWN ){
         if(cur_selection+1 > cur_sel_max){
@@ -254,8 +266,17 @@ void joystick_handler(){
         }else{
             cur_selection = cur_selection + 1;
         }
-        while( analogRead(JS_Y) <= JS_DOWN );
-      }
+    }
+
+    LCD_movement_handler();
+
+  }else if( js_trig_y && (y <= JS_UP || y >= JS_DOWN) ){
+      js_trig_y = 0;
+  }
+
+
+
+    
     
 }
 
@@ -283,6 +304,7 @@ void handle_select( int next_move ){
         // select Settings Screen
         case 3: cur_menu_page = 3;  
                 parent_menu_page = 1;
+                set_selection = 1;
                 break;
 
 //-------------------- X AXIS --------------------------//
