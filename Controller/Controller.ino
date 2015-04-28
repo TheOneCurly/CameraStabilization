@@ -122,13 +122,13 @@ void setup() {
 //        }
 //      }
 //    }
-//    
-//    // Enable movement
-//    digitalWrite(enable_x, HIGH);
-//    digitalWrite(enable_y, HIGH);
-//    digitalWrite(enable_z, HIGH);
-//    free(angle_values_init);
-//    free(error_angle_values_init);
+    
+    // Enable movement
+    digitalWrite(enable_x, HIGH);
+    digitalWrite(enable_y, HIGH);
+    digitalWrite(enable_z, HIGH);
+    free(angle_values_init);
+    free(error_angle_values_init);
 }
 
 
