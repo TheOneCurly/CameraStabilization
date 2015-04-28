@@ -93,35 +93,35 @@ void setup() {
     imu_error.init();
     imu_error.poll(error_angle_values);
     
-//    while(!imu_ready || !imu_error_ready){
-//      delay(15); // needs small delay for init DO NOT REMOVE >:( 
-//      imu_valid = false;
-//      imu_error_valid = false;
-//      angle_values_init[0] = angle_values[0];
-//      angle_values_init[1] = angle_values[1];
-//      angle_values_init[2] = angle_values[2];
-//     
-//      error_angle_values_init[0] = error_angle_values[0];
-//      error_angle_values_init[1] = error_angle_values[1];
-//      error_angle_values_init[2] = error_angle_values[2];
-//      
-//      imu_valid = imu.poll(angle_values);
-//      imu_error_valid = imu_error.poll(error_angle_values);
-//      
-//      if(imu_valid && !imu_ready){ 
-//        if((abs(angle_values[0] - angle_values_init[0])<ANGLE_INIT_THRESHOLD && abs(angle_values[1] - angle_values_init[1])<ANGLE_INIT_THRESHOLD && abs(angle_values[2] - angle_values_init[2])<ANGLE_INIT_THRESHOLD)){
-//          setBaseAngles(angle_values,0);
-//          imu_ready = true;
-//        }
-//      }
-//      
-//      if(imu_error_valid && !imu_error_ready){
-//        if((abs(error_angle_values[0] - error_angle_values_init[0])<ANGLE_INIT_THRESHOLD && abs(error_angle_values[1] - error_angle_values_init[1])<ANGLE_INIT_THRESHOLD && abs(error_angle_values[2] - error_angle_values_init[2])<ANGLE_INIT_THRESHOLD)){
-//          setBaseAngles(error_angle_values,1);
-//          imu_error_ready = true;
-//        }
-//      }
-//    }
+    while(!imu_ready || !imu_error_ready){
+      delay(15); // needs small delay for init DO NOT REMOVE >:( 
+      imu_valid = false;
+      imu_error_valid = false;
+      angle_values_init[0] = angle_values[0];
+      angle_values_init[1] = angle_values[1];
+      angle_values_init[2] = angle_values[2];
+     
+      error_angle_values_init[0] = error_angle_values[0];
+      error_angle_values_init[1] = error_angle_values[1];
+      error_angle_values_init[2] = error_angle_values[2];
+      
+      imu_valid = imu.poll(angle_values);
+      imu_error_valid = imu_error.poll(error_angle_values);
+      
+      if(imu_valid && !imu_ready){ 
+        if((abs(angle_values[0] - angle_values_init[0])<ANGLE_INIT_THRESHOLD && abs(angle_values[1] - angle_values_init[1])<ANGLE_INIT_THRESHOLD && abs(angle_values[2] - angle_values_init[2])<ANGLE_INIT_THRESHOLD)){
+          setBaseAngles(angle_values,0);
+          imu_ready = true;
+        }
+      }
+      
+      if(imu_error_valid && !imu_error_ready){
+        if((abs(error_angle_values[0] - error_angle_values_init[0])<ANGLE_INIT_THRESHOLD && abs(error_angle_values[1] - error_angle_values_init[1])<ANGLE_INIT_THRESHOLD && abs(error_angle_values[2] - error_angle_values_init[2])<ANGLE_INIT_THRESHOLD)){
+          setBaseAngles(error_angle_values,1);
+          imu_error_ready = true;
+        }
+      }
+    }
     
     // Enable movement
     digitalWrite(enable_x, HIGH);
@@ -142,31 +142,31 @@ void loop() {
     base_imu_flag = imu.poll(angle_values);
     error_imu_flag = imu_error.poll(error_angle_values);
 
-//    //pid returns 3 duty cycles
-//    //ignore cases where there was a fifo overflow
-//    if( error_imu_flag && base_imu_flag ){
-//      duty = PIDMovementCalc_withError(angle_values, error_angle_values);
-//      
-//     // debug
-//      Serial.print(F("duty cycles: \t"));                               
-//      Serial.print(duty[0]);
-//      Serial.print(F("\t"));
-//      Serial.print(duty[1]);
-//      Serial.print(F("\t"));
-//      Serial.println(duty[2]);
-//      Serial.println(F(""));
-//      
-//      //set duty cycles
-//      motorPinx.duty(duty[0]);
-//      motorPiny.duty(duty[1]);
-//      motorPinz.duty(duty[2]);
-//      
-//      free(duty);
-//      //repeat
-//    }
-//    else{
-//      Serial.println(F("Ignoring duty calculations because of fifo overflow."));
-//    }
+    //pid returns 3 duty cycles
+    //ignore cases where there was a fifo overflow
+    if( error_imu_flag && base_imu_flag ){
+      duty = PIDMovementCalc_withError(angle_values, error_angle_values);
+      
+     // debug
+      Serial.print(F("duty cycles: \t"));                               
+      Serial.print(duty[0]);
+      Serial.print(F("\t"));
+      Serial.print(duty[1]);
+      Serial.print(F("\t"));
+      Serial.println(duty[2]);
+      Serial.println(F(""));
+      
+      //set duty cycles
+      motorPinx.duty(duty[0]);
+      motorPiny.duty(duty[1]);
+      motorPinz.duty(duty[2]);
+      
+      free(duty);
+      //repeat
+    }
+    else{
+      Serial.println(F("Something went wrong in retreiving IMU data"));
+    }
 }
 
 

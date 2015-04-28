@@ -23,6 +23,7 @@ class IMUController{
         MPU6050* getIMU();
         
     private:   
+    int imu_num;
     // orientation/motion vars   
     int16_t ax, ay, az;     // raw values from imu
     int16_t gx, gy, gz;

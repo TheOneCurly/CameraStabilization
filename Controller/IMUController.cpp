@@ -46,8 +46,10 @@ const int AVERAGE_COUNT = 6;
  ******************************************************************************/
 IMUController::IMUController (int addr){
     if(addr == 0){
+        imu_num = 0;
         mpu = MPU6050(0x68);
     }else{
+        imu_num = 1;
         mpu = MPU6050(0x69);
     }
 }
@@ -74,6 +76,8 @@ bool IMUController::init(){
     //    mpu.setYGyroOffset(76);
     //    mpu.setZGyroOffset(-85);
     //    mpu.setZAccelOffset(1788); // 1688 factory default for my test chip
+    
+    return true;
 }
 
 /**
@@ -133,6 +137,16 @@ bool IMUController::poll(float* angle_values){
     angle_values[0] = 50;
     angle_values[1] = 50;
     angle_values[2] = 50;
+    
+    Serial.print(F(imu_num));
+    Serial.print(F("\t imu angles \t"));
+    Serial.print(angle_values[0]);
+    Serial.print(F("\t"));
+    Serial.print(angle_values[1]);
+    Serial.print(F("\t"));
+    Serial.println(angle_values[2]);
+    
+    return true;
 }
 
 MPU6050* IMUController::getIMU(){
