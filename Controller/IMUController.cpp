@@ -29,7 +29,7 @@
 
 /***************************** Variables *********************************/
 
-const int AVERAGE_COUNT = 6;
+const int AVERAGE_MAX_COUNT = 6;
 
 /***************************** ISR *********************************/
 
@@ -100,48 +100,47 @@ bool IMUController::init(){
  ******************************************************************************/
 bool IMUController::poll(float* angle_values){
     avg_count = 0;
-    mpu.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
-    Serial.print("a/g:\t");
-    Serial.print(ax); Serial.print("\t");
-    Serial.print(ay); Serial.print("\t");
-    Serial.print(az); Serial.print("\t");
-    Serial.print(gx); Serial.print("\t");
-    Serial.print(gy); Serial.print("\t");
-    Serial.println(gz);
-    
-//    if (ypr_count < AVERAGE_COUNT) {
-//      ypr_avg[0] += ypr[0];
-//      ypr_avg[1] += ypr[1];
-//      ypr_avg[2] += ypr[2];
-//      ypr_count ++;
-//    }else{
-//      #ifdef DEBUG
-//        Serial.print(interruptNum);
-//        Serial.print(F("\t ypr\t"));
-//        Serial.print(ypr_avg[0] * 180/(AVERAGE_COUNT*M_PI));
-//        Serial.print(F("\t"));
-//        Serial.print(ypr_avg[1] * 180/(AVERAGE_COUNT*M_PI));
-//        Serial.print(F("\t"));
-//        Serial.println(ypr_avg[2] * 180/(AVERAGE_COUNT*M_PI));
-//      #endif
-//
-//      ypr_avg[0] = ypr_avg[0] * 180/(AVERAGE_COUNT*M_PI);
-//      ypr_avg[1] = ypr_avg[1] * 180/(AVERAGE_COUNT*M_PI);
-//      ypr_avg[2] = ypr_avg[2] * 180/(AVERAGE_COUNT*M_PI);
+  
+//    while(avg_count < (AVERAGE_MAX_COUNT + 1)){
+//      mpu.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
+//      Serial.print("a/g:\t");
+//      Serial.print(ax); Serial.print("\t");
+//      Serial.print(ay); Serial.print("\t");
+//      Serial.print(az); Serial.print("\t");
+//      Serial.print(gx); Serial.print("\t");
+//      Serial.print(gy); Serial.print("\t");
+//      Serial.println(gz);
 //      
-//      angle_values[0] = ypr_avg[0];
-//      angle_values[1] = ypr_avg[1];
-//      angle_values[2] = ypr_avg[2];
-//      ypr_count = 0;
-//      ypr_avg[0] = 0;
-//      ypr_avg[1] = 0;
-//      ypr_avg[2] = 0;
-//      mpu.resetFIFO();       
-//      return true;   
-
-    // this is where the conditioning of the raw values will occur. 
-    // this should return 3 float angles
-    // maybe average 10 calculations?
+//      // do calculations to make the raw values into angles
+//      //raw_converted_angle[0] = ...;
+//      
+//      if( avg_count < AVERAGE_MAX_COUNT){
+//        angle_avg[0] += raw_converted_angle[0];
+//        angle_avg[1] += raw_converted_angle[1];
+//        angle_avg[2] += raw_converted_angle[2];
+//        avg_count++;
+//      }
+//      else{
+//        angle_avg[0] = angle_avg[0]/AVERAGE_MAX_COUNT;
+//        angle_avg[1] = angle_avg[1]/AVERAGE_MAX_COUNT;
+//        angle_avg[2] = angle_avg[2]/AVERAGE_MAX_COUNT;
+//        
+//        Serial.print(imu_num);
+//        Serial.print(F("\t angles \t"));
+//        Serial.print(angle_avg[0]);
+//        Serial.print(F("\t"));
+//        Serial.print(angle_avg[1]);
+//        Serial.print(F("\t"));
+//        Serial.println(angle_avg[2]);
+//        
+//        angle_values[0] = angle_avg[0];
+//        angle_values[1] = angle_avg[1];
+//        angle_values[2] = angle_avg[2];
+//        avg_count = 0;
+//        return true;
+//      }  
+//    }  
+    
     angle_values[0] = 50;
     angle_values[1] = 50;
     angle_values[2] = 50;

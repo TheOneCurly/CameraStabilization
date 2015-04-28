@@ -29,6 +29,7 @@ class IMUController{
     int16_t gx, gy, gz;
     
     float angle_avg[3];
+    float raw_converted_angle[3];
     int avg_count = 0;
     MPU6050 mpu;
     
