@@ -54,10 +54,7 @@ void initialize_LCD(){
   
     //Display the initialization screen
     //draw();
-    u8g.firstPage();  
-    do {
-        draw();
-    } while( u8g.nextPage() );
+    LCD_movement_handler( 1 );
 }
 
 
@@ -86,11 +83,8 @@ void u8g_prepare(){
 void sys_init_complete(){
     cur_menu_page = 1;
 
-    u8g.firstPage();  
-    do {
-        draw();
-    } while( u8g.nextPage() );
-    //draw();
+    LCD_movement_handler( 1 );
+
 }
 
 
@@ -102,12 +96,14 @@ void sys_init_complete(){
  * requested, the screen just refreshes and updates.
  *
  ******************************************************************************/
-void LCD_movement_handler(){
+void LCD_movement_handler(int special){
   
-    //Check for user input/what the user has done.
-    joystick_check();
-    fwd_butt_check();
-    bck_butt_check();
+    if(special == 0){
+        //Check for user input/what the user has done.
+        joystick_check();
+        fwd_butt_check();
+        bck_butt_check();
+    }
   
     //Handle user request  
     if(next_move > 0){
@@ -443,6 +439,7 @@ void fwd_butt_handler(){
     if(fwd == 0){
         cur_menu_page = 2;
         in_UI = true;
+        LCD_movement_handler(1);
     }
 
 }
