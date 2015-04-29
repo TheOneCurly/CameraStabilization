@@ -74,12 +74,12 @@ static U8GLIB_LM6059_2X u8g(21, 18, 28, 32, 30);
 static int cur_menu_page = 0;
 static int cur_selection, cur_sel_max, cur_sel_min = 0;
 
-static int next_move = 0;
+static int next_move = -1;
 static int enable_side_scroll = 0;
 static int set_selection = 1;
 
 // System Settings Defaults 
-static int color_set = 3; //Green
+static int color_set = 2; //Green
 static int cursor_set = 2; //Right Waka (>)
 
 
@@ -112,12 +112,12 @@ void draw();
 
 //------------------------------ NAVIGATION FUNCTIONS -------------------------------\\
 
-void LCD_movement_handler();
+bool LCD_movement_handler(int special);
 void handle_select( int command );
 void joystick_check();
 void fwd_butt_check();
 void bck_butt_check();
-void fwd_butt_handler();
+bool fwd_butt_handler();
 
 //-------------------------- SYSTEM MANIPULATION FUNCTIONS --------------------------\\
 

@@ -96,8 +96,10 @@ void sys_init_complete(){
  * requested, the screen just refreshes and updates.
  *
  ******************************************************************************/
-void LCD_movement_handler(int special){
+bool LCD_movement_handler(int special){
   
+    bool return_val = true;
+    
     if(special == 0){
         //Check for user input/what the user has done.
         joystick_check();
@@ -120,7 +122,7 @@ void LCD_movement_handler(int special){
     }else if (next_move == 0){
         //Triggered by being on the home screen, exit UI mode.
         cur_menu_page = 1;
-        in_UI = false;
+        return_val = false;
     }
   
     u8g.firstPage();  
@@ -129,6 +131,8 @@ void LCD_movement_handler(int special){
     } while( u8g.nextPage() );
   
     next_move = -1;
+    
+    return return_val;
 }
 
 
@@ -144,8 +148,8 @@ void LCD_movement_handler(int special){
  ******************************************************************************/
 void draw_cursor( int cur_menu_index ){
     switch( cursor_set ){
-        case 2: u8g.drawStr(0, cur_menu_index*MENU_HEIGHT, ">"); break;
-        case 3: u8g.drawBitmap(0, cur_menu_index*MENU_HEIGHT, 1,  MENU_HEIGHT, paw_bitmap); break;
+        case 1: u8g.drawStr(0, cur_menu_index*MENU_HEIGHT, ">"); break;
+        case 2: u8g.drawBitmap(0, cur_menu_index*MENU_HEIGHT, 1,  8, paw_bitmap); break;
     }
 }
 
@@ -178,24 +182,24 @@ void draw_sys(){
 
     //X
     u8g.drawStr(0, 2*MENU_HEIGHT, " X:" );
-    u8g.drawStr(MENU_INDENT, 2*MENU_HEIGHT, itoa(round(xControl), buf, 10)); 
+    u8g.drawStr(3*MENU_INDENT, 2*MENU_HEIGHT, itoa(round(xControl), buf, 10)); 
 
-    u8g.drawStr(5*MENU_INDENT, 2*MENU_HEIGHT, "X:" );
-    u8g.drawStr(6*MENU_INDENT, 2*MENU_HEIGHT, itoa(round(xError), buf, 10));
+    u8g.drawStr(9*MENU_INDENT, 2*MENU_HEIGHT, "X:" );
+    u8g.drawStr(11*MENU_INDENT, 2*MENU_HEIGHT, itoa(round(xError), buf, 10));
 
     //Y
     u8g.drawStr(0, 3*MENU_HEIGHT, " Y:" );
-    u8g.drawStr(MENU_INDENT, 3*MENU_HEIGHT, itoa(round(yControl), buf, 10)); 
+    u8g.drawStr(3*MENU_INDENT, 3*MENU_HEIGHT, itoa(round(yControl), buf, 10)); 
 
-    u8g.drawStr(5*MENU_INDENT, 3*MENU_HEIGHT, "Y:" );
-    u8g.drawStr(6*MENU_INDENT, 3*MENU_HEIGHT, itoa(round(yError), buf, 10)); 
+    u8g.drawStr(9*MENU_INDENT, 3*MENU_HEIGHT, "Y:" );
+    u8g.drawStr(11*MENU_INDENT, 3*MENU_HEIGHT, itoa(round(yError), buf, 10)); 
 
     //Z
     u8g.drawStr(0, 4*MENU_HEIGHT, " Z:" );
-    u8g.drawStr(MENU_INDENT, 4*MENU_HEIGHT, itoa(round(zControl), buf, 10)); 
+    u8g.drawStr(3*MENU_INDENT, 4*MENU_HEIGHT, itoa(round(zControl), buf, 10)); 
 
-    u8g.drawStr(5*MENU_INDENT, 4*MENU_HEIGHT, "Z:" );
-    u8g.drawStr(6*MENU_INDENT, 4*MENU_HEIGHT, itoa(round(zError), buf, 10)); 
+    u8g.drawStr(9*MENU_INDENT, 4*MENU_HEIGHT, "Z:" );
+    u8g.drawStr(11*MENU_INDENT, 4*MENU_HEIGHT, itoa(round(zError), buf, 10)); 
     
     u8g.drawStr(0, 6*MENU_HEIGHT, "PRESS FWD TO ENTER UI");
 }
@@ -230,28 +234,29 @@ void draw_home(){
  *
  ******************************************************************************/
 void draw_axis_select(){
-    draw_cursor(cur_selection - 18);
+    draw_cursor(cur_selection - 17);
     u8g.drawStr(0, 0, "-- AXIS UNLOCK/LOCK --");
-    u8g.drawStr(0, MENU_HEIGHT, "NOTE: Lock is Stabilized");
+    u8g.drawStr(0, MENU_HEIGHT, "NOTE:");
+    u8g.drawStr(MENU_INDENT, 2*MENU_HEIGHT, "  Lock is Stabilized");
 
     if(X_control_en){ //true = stabilized = lock
-        u8g.drawStr(MENU_INDENT, 2*MENU_HEIGHT, "Unlock X Axis (Pan)");
+        u8g.drawStr(MENU_INDENT, 3*MENU_HEIGHT, "Unlock X Axis (Pan)");
     }else{
-        u8g.drawStr(MENU_INDENT, 2*MENU_HEIGHT, "Lock X Axis (Pan)");
+        u8g.drawStr(MENU_INDENT, 3*MENU_HEIGHT, "Lock X Axis (Pan)");
     }
 
 
     if(Y_control_en){ //true = stabilized = lock
-        u8g.drawStr(MENU_INDENT, 3*MENU_HEIGHT, "Unlock Y Axis (Tilt)");
+        u8g.drawStr(MENU_INDENT, 4*MENU_HEIGHT, "Unlock Y Axis (Tilt)");
     }else{
-        u8g.drawStr(MENU_INDENT, 3*MENU_HEIGHT, "Lock Y Axis (Tilt)");
+        u8g.drawStr(MENU_INDENT, 4*MENU_HEIGHT, "Lock Y Axis (Tilt)");
     }
 
 
     if(Z_control_en){ //true = stabilized = lock
-        u8g.drawStr(MENU_INDENT, 4*MENU_HEIGHT, "Unlock Z Axis (Pitch)");
+        u8g.drawStr(MENU_INDENT, 5*MENU_HEIGHT, "Unlock Z Axis (Pitch)");
     }else{
-        u8g.drawStr(MENU_INDENT, 4*MENU_HEIGHT, "Lock Z Axis (Pitch)");
+        u8g.drawStr(MENU_INDENT, 5*MENU_HEIGHT, "Lock Z Axis (Pitch)");
     }
 }
 
@@ -270,38 +275,38 @@ void draw_settings(){
     
     //Determine which color option to display.
     if ( cur_selection == 80 ){
-        switch( (set_selection % 5) + color_set ){
-            case 2: u8g.drawStr(MENU_INDENT, 4*MENU_HEIGHT, "Color [ Blue   ]"); break;
-            case 3: u8g.drawStr(MENU_INDENT, 4*MENU_HEIGHT, "Color [ Green  ]"); break;
-            case 4: u8g.drawStr(MENU_INDENT, 4*MENU_HEIGHT, "Color [ Red    ]"); break;
-            case 5: u8g.drawStr(MENU_INDENT, 4*MENU_HEIGHT, "Color [ Purple ]"); break;
-            case 6: u8g.drawStr(MENU_INDENT, 4*MENU_HEIGHT, "Color [ Off    ]"); break;
+        switch( (set_selection % 5)){
+            case 1: u8g.drawStr(MENU_INDENT, 4*MENU_HEIGHT, "Color [ Blue   ]"); break;
+            case 2: u8g.drawStr(MENU_INDENT, 4*MENU_HEIGHT, "Color [ Green  ]"); break;
+            case 3: u8g.drawStr(MENU_INDENT, 4*MENU_HEIGHT, "Color [ Red    ]"); break;
+            case 4: u8g.drawStr(MENU_INDENT, 4*MENU_HEIGHT, "Color [ Purple ]"); break;
+            case 5: u8g.drawStr(MENU_INDENT, 4*MENU_HEIGHT, "Color [ Off    ]"); break;
 
         }
     }else{
         switch( color_set ){
-            case 2: u8g.drawStr(MENU_INDENT, 4*MENU_HEIGHT, "Color [ Blue   ]"); break;
-            case 3: u8g.drawStr(MENU_INDENT, 4*MENU_HEIGHT, "Color [ Green  ]"); break;
-            case 4: u8g.drawStr(MENU_INDENT, 4*MENU_HEIGHT, "Color [ Red    ]"); break;
-            case 5: u8g.drawStr(MENU_INDENT, 4*MENU_HEIGHT, "Color [ Purple ]"); break;
-            case 6: u8g.drawStr(MENU_INDENT, 4*MENU_HEIGHT, "Color [ Off    ]"); break;
+            case 1: u8g.drawStr(MENU_INDENT, 4*MENU_HEIGHT, "Color [ Blue   ]"); break;
+            case 2: u8g.drawStr(MENU_INDENT, 4*MENU_HEIGHT, "Color [ Green  ]"); break;
+            case 3: u8g.drawStr(MENU_INDENT, 4*MENU_HEIGHT, "Color [ Red    ]"); break;
+            case 4: u8g.drawStr(MENU_INDENT, 4*MENU_HEIGHT, "Color [ Purple ]"); break;
+            case 5: u8g.drawStr(MENU_INDENT, 4*MENU_HEIGHT, "Color [ Off    ]"); break;
 
         }
     }
 
     //Determine which cursor option to display.
     if ( cur_selection == 81 ){
-        switch( (set_selection % 2) + cursor_set ){
-            case 2: u8g.drawStr(MENU_INDENT, 5*MENU_HEIGHT, "Cursor  [   >  ]"); break;
-            case 3: u8g.drawStr(MENU_INDENT, 5*MENU_HEIGHT, "Cursor  [      ]");
-                    u8g.drawBitmap( 3*MENU_INDENT, 5*MENU_HEIGHT, 1, MENU_HEIGHT, paw_bitmap);
+        switch( (set_selection % 2)){
+            case 1: u8g.drawStr(MENU_INDENT, 5*MENU_HEIGHT, "Cursor  [   >  ]"); break;
+            case 2: u8g.drawStr(MENU_INDENT, 5*MENU_HEIGHT, "Cursor  [      ]");
+                    u8g.drawBitmap( 9*MENU_INDENT, 5*MENU_HEIGHT, 1, 8, paw_bitmap);
                     break;
         }
     }else{
         switch( cursor_set ){
-            case 2: u8g.drawStr(MENU_INDENT, 5*MENU_HEIGHT, "Cursor  [   >  ]"); break;
-            case 3: u8g.drawStr(MENU_INDENT, 5*MENU_HEIGHT, "Cursor  [      ]"); 
-                    u8g.drawBitmap( 3*MENU_INDENT, 5*MENU_HEIGHT, 1, MENU_HEIGHT, paw_bitmap);
+            case 1: u8g.drawStr(MENU_INDENT, 5*MENU_HEIGHT, "Cursor  [   >  ]"); break;
+            case 2: u8g.drawStr(MENU_INDENT, 5*MENU_HEIGHT, "Cursor  [      ]"); 
+                    u8g.drawBitmap( 9*MENU_INDENT, 5*MENU_HEIGHT, 1, 8, paw_bitmap);
                     break;
         }
     }
@@ -340,8 +345,8 @@ void draw(){
 void bck_butt_check(){
     int bck = analogRead(BCK_BUTT);
 
-    Serial.print("Back Butt\t");
-    Serial.println(bck);
+   // Serial.print("Back Butt\t");
+    //Serial.println(bck);
 
     if( bck >= BUTT_PUSH ){
         next_move = 0;
@@ -361,8 +366,8 @@ void bck_butt_check(){
 void fwd_butt_check(){
     int fwd = analogRead(FWD_BUTT);
   
-    Serial.print("Front Butt\t");
-    Serial.println(fwd);
+    //Serial.print("Front Butt\t");
+   // Serial.println(fwd);
   
     if(fwd == 0){
         next_move = cur_selection;
@@ -384,39 +389,46 @@ void joystick_check(){
     int x = analogRead(JS_X);
     int y = analogRead(JS_Y);
     
-    Serial.print("JOYSTICK\t");
-    Serial.print(x);
-    Serial.print("\t");
-    Serial.println(y);
+    //Serial.print("JOYSTICK\t");
+    //Serial.print(x);
+    //Serial.print("\t");
+    //Serial.println(y);
     
     //Determine which direction was selected.
     //Left and right are only enabled on apropriate screens,
     //like Settings or Axis Adjust screens. 
   
     if( enable_side_scroll && x >= JS_RIGHT ){
-        set_selection++;
+        set_selection--;
+        if(set_selection < 1){
+            set_selection = 1;
+        }
         while( analogRead(JS_X) >= JS_RIGHT );
 
     }else if( enable_side_scroll && x <= JS_LEFT ){
-        set_selection--;
+        
+        set_selection++;
+        if(set_selection < 1){
+            set_selection = 1;
+        }
         while( analogRead(JS_X) <= JS_LEFT );
 
     }else if( y >= JS_UP ){
-        if( (cur_selection - 1) < cur_sel_min ){
-            cur_selection = cur_sel_max;
-        }else{
-            cur_selection = cur_selection - 1;
-        }
-
-        while( analogRead(JS_Y) >= JS_UP );
-
-    }else if( y <= JS_DOWN ){
         if( (cur_selection + 1) > cur_sel_max ){
             cur_selection = cur_sel_min;
         }else{
             cur_selection = cur_selection + 1;
         }
+        set_selection = 1;
+        while( analogRead(JS_Y) >= JS_UP );
 
+    }else if( y <= JS_DOWN ){
+        if( (cur_selection - 1) < cur_sel_min ){
+            cur_selection = cur_sel_max;
+        }else{
+            cur_selection = cur_selection - 1;
+        }
+        set_selection = 1;
         while( analogRead(JS_Y) <= JS_DOWN );
     }
 }
@@ -430,18 +442,18 @@ void joystick_check(){
  * the user is not in the UI.
  *
  ******************************************************************************/
-void fwd_butt_handler(){
+bool fwd_butt_handler(){
+    bool return_val = false;
     int fwd = analogRead(FWD_BUTT);
 
-    Serial.print("Front Butt\t");
-    Serial.println(fwd);
-
     if(fwd == 0){
+        //Serial.print("Front Butt\t");
+        //Serial.println(fwd);
         cur_menu_page = 2;
-        in_UI = true;
+        return_val = true;
         LCD_movement_handler(1);
     }
-
+    return return_val;
 }
 
 
@@ -484,11 +496,12 @@ void handle_select( int next_move ){
                  break;
 
 //-----------------UI SETTINGS --------------------------//       
-        case 80: set_background_color((set_selection % 5) + color_set);
+        case 80: color_set = (set_selection % 5) ;
+                 set_background_color(color_set);
                  set_selection = 1;
                  break;
 
-        case 81: cursor_set = (set_selection % 2) + color_set;
+        case 81: cursor_set = (set_selection % 2);
                  set_selection = 1;
                  break;
     }
@@ -509,31 +522,31 @@ void set_background_color( int color ){
   //--- (ie. if you want green set blue and red high, and green low.
     switch( color ){
       //--------------------  BLUE  --------------------------//
-      case 2: digitalWrite(BACKLIGHT_LED, HIGH);
+      case 1: digitalWrite(BACKLIGHT_LED, HIGH);
               digitalWrite(BLUE_LED, LOW); //Blue
               digitalWrite(GREEN_LED, HIGH); //Green
               digitalWrite(RED_LED, HIGH); //Red
               break;
       //-------------------- GREEN --------------------------//
-      case 3: digitalWrite(BACKLIGHT_LED, HIGH);
+      case 2: digitalWrite(BACKLIGHT_LED, HIGH);
               digitalWrite(BLUE_LED, HIGH); //Blue
               digitalWrite(GREEN_LED, LOW); //Green
               digitalWrite(RED_LED, HIGH); //Red
               break;
       //--------------------  RED  --------------------------//
-      case 4: digitalWrite(BACKLIGHT_LED, HIGH);
+      case 3: digitalWrite(BACKLIGHT_LED, HIGH);
               digitalWrite(BLUE_LED, HIGH); //Blue
               digitalWrite(GREEN_LED, HIGH); //Green
               digitalWrite(RED_LED, LOW); //Red
               break;
       //------------------- PURPLE -------------------------//
-      case 5: digitalWrite(BACKLIGHT_LED, HIGH);
+      case 4: digitalWrite(BACKLIGHT_LED, HIGH);
               digitalWrite(BLUE_LED, LOW); //Blue
               digitalWrite(GREEN_LED, HIGH); //Green
               digitalWrite(RED_LED, LOW); //Red
               break;
       //-------------------- OFF --------------------------//
-      case 6: digitalWrite(BACKLIGHT_LED, HIGH);
+      case 5: digitalWrite(BACKLIGHT_LED, HIGH);
               digitalWrite(BLUE_LED, HIGH); //Blue
               digitalWrite(GREEN_LED, HIGH); //Green
               digitalWrite(RED_LED, HIGH); //Red

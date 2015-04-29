@@ -26,6 +26,6 @@
 	static float xControl, yControl, zControl;
 	static float xDuty, yDuty, zDuty;
 
-	static bool in_UI = false;
+	static bool in_UI = 0;
 	
 #endif 

@@ -17,6 +17,7 @@
  
 #include "PID.h"
 #include "customPWM.h"
+#include "Variables.h"
 
 const float ANGLE_INIT_THRESHOLD = 0.2;
 
@@ -153,7 +154,9 @@ void setup() {
 // ================================================================
 
 void loop() {
-    if(!in_UI){
+    //Serial.print("UI: ");
+    //Serial.println(in_UI);
+    if(in_UI == 0){
         // //get angles from poll
         // base_imu_flag = imu.poll(angle_values);
         // error_imu_flag = imu_error.poll(error_angle_values);
@@ -184,10 +187,10 @@ void loop() {
         //     Serial.println(F("Something went wrong in retreiving IMU data"));
         // }
     
-        fwd_butt_handler();
+        in_UI = fwd_butt_handler();
     }else{
       //stop using the IMU, focus on only the LCD interface.
-      LCD_movement_handler();
+      in_UI = LCD_movement_handler(0);
     }
 }
 
