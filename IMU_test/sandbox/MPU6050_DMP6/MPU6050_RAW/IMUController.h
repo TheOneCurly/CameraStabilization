@@ -12,8 +12,6 @@
 #ifndef _IMU_CONTROL_H_
 #define _IMU_CONTROL_H_
 
-#include "MPU6050_6Axis_MotionApps20.h"
-
 #include <Wire.h>
 #include "Arduino.h"
 #include "calibration.h"
@@ -40,7 +38,7 @@ class IMUController{
 		int16_t acc_off_x, acc_off_y, acc_off_z;
 		float acc_scale_x, acc_scale_y, acc_scale_z;
                 float gyro_sensitivity;
-                int imu_num;
+
 	private:
 		void zeroGyro();
 		void getRawValues(int16_t * raw_values);
@@ -63,5 +61,5 @@ class IMUController{
 
 float invSqrt(float number);
 void arr3_rad_to_deg(float * arr);
-#endif /* _IMU_CONTROL_H_ */
 
+#endif /* _IMU_CONTROL_H_ */

@@ -48,9 +48,6 @@ customPWM motorPinz(PWM_pin_z);
 // Arduino Wire library is required if I2Cdev I2CDEV_ARDUINO_WIRE implementation
 // is used in I2Cdev.h
 #if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
-    //#ifndef TWI_FREQ
-    //#define TWI_FREQ 400000L
-    //#endif
     #include "Wire.h"
 #endif
 
@@ -61,21 +58,10 @@ IMUController imu_error(1);
 #include "LCD_Controller.h"
 
 int* duty;
-float* angle_values = (float*) malloc(3*sizeof(float));
-float* error_angle_values = (float*) malloc(3*sizeof(float));
-float* angle_values_init = (float*) malloc(3*sizeof(float));
-float* error_angle_values_init = (float*) malloc(3*sizeof(float));
-// ================================================================
-// ===               INTERRUPT DETECTION ROUTINE                ===
-// ================================================================
-//
-void dmp0DataReady() {
-    imu.mpuInterrupt = true;
-}
-
-void dmp1DataReady() {
-    imu_error.mpuInterrupt = true;
-}
+float* angle_values = (float*) calloc(3,sizeof(float));
+float* error_angle_values = (float*) calloc(3,sizeof(float));
+float* angle_values_init = (float*) calloc(3,sizeof(float));
+float* error_angle_values_init = (float*) calloc(3,sizeof(float));
 
 // ================================================================
 // ===                      INITIAL SETUP                       ===
@@ -83,18 +69,10 @@ void dmp1DataReady() {
 
 void setup() {
     Serial.begin(115200);
+
     initialize_LCD();
-    
-//    pinMode(FWD_BUTT, INPUT);
-//    pinMode(BCK_BUTT, INPUT);
-//    pinMode(JS_X, INPUT);
-//    pinMode(JS_Y, INPUT);
-//    
-//    digitalWrite(FWD_BUTT, HIGH);
-//    digitalWrite(BCK_BUTT, HIGH);
-//    digitalWrite(JS_X, HIGH);
-//    digitalWrite(JS_Y, HIGH);
-    
+    Wire.begin();
+
     // Set pin modes
     pinMode(brake_x, OUTPUT);
     pinMode(brake_y, OUTPUT);
@@ -123,8 +101,6 @@ void setup() {
     attachInterrupt(JS_X, joystick_handler, HIGH);
     attachInterrupt(JS_Y, joystick_handler, HIGH);
 
-
-    
     bool imu_ready = false;
     bool imu_error_ready = false;
     bool imu_valid = false;
@@ -210,7 +186,7 @@ void loop() {
       //repeat
     }
     else{
-      Serial.println(F("Ignoring duty calculations because of fifo overflow."));
+      Serial.println(F("Something went wrong in retreiving IMU data"));
     }
 }
 

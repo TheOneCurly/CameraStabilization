@@ -10,16 +10,14 @@
  *                        Provides initialization and polling.
  *
  */
- /***************************** Preprocessor Flags ****************************/
+ 
  #include "IMUController.h"
  
 IMUController::IMUController (int addr){
   if(addr == 0){
 	  mpu = MPU6050(0x68);
-          imu_num = 0;
   }else{
 	  mpu = MPU6050(0x69);
-          imu_num = 1;
   }
 }
 
@@ -61,7 +59,42 @@ bool IMUController::init(){
 	
 	// zero gyro
 	zeroGyro();
+
+        // load calibration from eeprom
+        //calLoad();
 }
+
+//static uint8_t location; // assuming ordered reads
+//
+//void eeprom_read_var(uint8_t size, byte * var) {
+//  for(uint8_t i = 0; i<size; i++) {
+//    var[i] = EEPROM.read(location + i);
+//  }
+//  location += size;
+//}
+//
+//void FreeIMU::calLoad() {
+//      if(EEPROM.read(FREEIMU_EEPROM_BASE) == FREEIMU_EEPROM_SIGNATURE) { // check if signature is ok so we have good data
+//    location = FREEIMU_EEPROM_BASE + 1; // reset location
+//    
+//    eeprom_read_var(sizeof(acc_off_x), (byte *) &acc_off_x);
+//    eeprom_read_var(sizeof(acc_off_y), (byte *) &acc_off_y);
+//    eeprom_read_var(sizeof(acc_off_z), (byte *) &acc_off_z);
+//    
+//    eeprom_read_var(sizeof(acc_scale_x), (byte *) &acc_scale_x);
+//    eeprom_read_var(sizeof(acc_scale_y), (byte *) &acc_scale_y);
+//    eeprom_read_var(sizeof(acc_scale_z), (byte *) &acc_scale_z);
+//    
+//      }
+//      else {
+//    acc_off_x = 0;
+//    acc_off_y = 0;
+//    acc_off_z = 0;
+//    acc_scale_x = 1;
+//    acc_scale_y = 1;
+//    acc_scale_z = 1;
+//      }
+//}
 
 void IMUController::getRawValues(int16_t * raw_values) {
     mpu.getMotion6(&raw_values[0], &raw_values[1], &raw_values[2], &raw_values[3], &raw_values[4], &raw_values[5]);
@@ -261,30 +294,11 @@ void IMUController::getYawPitchRoll(float * ypr) {
 }
 
 bool IMUController::poll(float* angle_values){
-    float data[3];
-    for (int i = 0; i < 10; i++){
-        getYawPitchRoll(data);;
-        angle_values[0] += data[0];
-        angle_values[1] += data[1];
-     	angle_values[2] += data[2];
-    }
-    
-    angle_values[0] = angle_values[0]/10;
-    angle_values[1] = angle_values[1]/10;
-    angle_values[2] = angle_values[2]/10;
-    
-    Serial.print(imu_num);
-    Serial.print(F("\t angles \t"));
-    Serial.print(angle_values[0]);
-    Serial.print(F("\t"));
-    Serial.print(angle_values[1]);
-    Serial.print(F("\t"));
-    Serial.println(angle_values[2]);
+	getYawPitchRoll(angle_values);
+	if (angle_values)
+		return true;
 	
-    if (angle_values)
-	return true;
-	
-    return false;
+	return false;
 }
 
 /**
