@@ -15,6 +15,7 @@
 #include <U8glib.h>
 #include "Arduino.h"
 #include "LCD_Controller.h"
+#include "String.h"
 
 #define MENU_INDENT 8
 #define MENU_HEIGHT 9
@@ -145,7 +146,7 @@ void LCD_movement_handler(){
 void draw_cursor( int cur_menu_index ){
     switch( cursor_set ){
         case 2: u8g.drawStr(0, cur_menu_index*MENU_HEIGHT, ">"); break;
-        case 3: u8g.drawBitmap(0, cur_menu_index*MENU_HEIGHT, MENU_HEIGHT, paw_bitmap); break;
+        case 3: u8g.drawBitmap(0, cur_menu_index*MENU_HEIGHT, 1,  MENU_HEIGHT, paw_bitmap); break;
     }
 }
 
@@ -173,15 +174,18 @@ void draw_init(){
  ******************************************************************************/
 void draw_sys(){
     u8g.drawStr(0, 0, "----- SYSTEM INFO ----");
-    u8g.drawStr(0, MENU_HEIGHT, "TOP IMU    BOTTOM IMU"); 
-    u8g.drawStr(0, 2*MENU_HEIGHT, concat(" X:", round(xControl)); 
-    u8g.drawStr(0, 2*MENU_HEIGHT, concat("            X:", round(xError))); 
+    u8g.drawStr(0, MENU_HEIGHT, "TOP IMU    BOTTOM IMU");
+    u8g.drawStr(0, 2*MENU_HEIGHT, " X:"); 
+    //u8g.drawStr(0, 2*MENU_HEIGHT, " X:" + round(xControl)); 
+    //u8g.drawStr(0, 2*MENU_HEIGHT, "            X:" + round(xError)); 
 
-    u8g.drawStr(0, 3*MENU_HEIGHT, concat(" Y:", round(yControl))); 
-    u8g.drawStr(0, 3*MENU_HEIGHT, concat("            Y:", round(yError))); 
-
-    u8g.drawStr(0, 4*MENU_HEIGHT, concat(" Z:", zControl))); 
-    u8g.drawStr(0, 4*MENU_HEIGHT, concat("            Z:", round(zError))); 
+    u8g.drawStr(0, 3*MENU_HEIGHT, " Y:"); 
+    //u8g.drawStr(0, 3*MENU_HEIGHT, " Y:"+ round(yControl)); 
+    //u8g.drawStr(0, 3*MENU_HEIGHT, "            Y:"+ round(yError)); 
+    
+    u8g.drawStr(0, 4*MENU_HEIGHT, " Z:"); 
+    //u8g.drawStr(0, 4*MENU_HEIGHT, " Z:"+ zControl)); 
+    //u8g.drawStr(0, 4*MENU_HEIGHT, "            Z:"+ round(zError)); 
 
     u8g.drawStr(0, 5*MENU_HEIGHT, "PRESS FWD TO ENTER UI");
 }
@@ -200,7 +204,7 @@ void draw_home(){
     u8g.drawStr(0, MENU_HEIGHT, "PRESS FWD TO SELECT");
     u8g.drawStr(MENU_INDENT, 2*MENU_HEIGHT, "AXIS LOCK/UNLOCK" );
     u8g.drawStr(MENU_INDENT, 3*MENU_HEIGHT, "SETTINGS");
-    u8g.drawStr(0, 0, 5*MENU_HEIGHT, "PRESS BCK TO EXIT UI");
+    u8g.drawStr(0, 5*MENU_HEIGHT, "PRESS BCK TO EXIT UI");
 }
 
 
@@ -280,14 +284,14 @@ void draw_settings(){
         switch( (set_selection % 2) + cursor_set ){
             case 2: u8g.drawStr(MENU_INDENT, 5*MENU_HEIGHT, "Cursor  [   >  ]"); break;
             case 3: u8g.drawStr(MENU_INDENT, 5*MENU_HEIGHT, "Cursor  [      ]");
-                    u8g.drawBitmap( 3*MENU_INDENT, 5*MENU_HEIGHT, MENU_HEIGHT, paw_bitmap);
+                    u8g.drawBitmap( 3*MENU_INDENT, 5*MENU_HEIGHT, 1, MENU_HEIGHT, paw_bitmap);
                     break;
         }
     }else{
         switch( cursor_set ){
             case 2: u8g.drawStr(MENU_INDENT, 5*MENU_HEIGHT, "Cursor  [   >  ]"); break;
             case 3: u8g.drawStr(MENU_INDENT, 5*MENU_HEIGHT, "Cursor  [      ]"); 
-                    u8g.drawBitmap( 3*MENU_INDENT, 5*MENU_HEIGHT, MENU_HEIGHT, paw_bitmap);
+                    u8g.drawBitmap( 3*MENU_INDENT, 5*MENU_HEIGHT, 1, MENU_HEIGHT, paw_bitmap);
                     break;
         }
     }

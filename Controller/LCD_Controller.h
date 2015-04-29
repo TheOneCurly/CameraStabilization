@@ -58,6 +58,7 @@
 #define JS_RIGHT 1023
 
 //---------------------------------- BUTTON VALUES ----------------------------------\\
+
 #define BUTT_PUSH 1000
 //---------------------------- Menu Navigation Values -------------------------------\\
 
@@ -109,6 +110,7 @@ void bck_butt_check();
 void fwd_butt_handler();
 
 //-------------------------- SYSTEM MANIPULATION FUNCTIONS --------------------------\\
+
 void unlock_axis( int axis );
 
 void set_background_color(int color);
