@@ -51,10 +51,10 @@ IMUController imu(0);
 IMUController imu_error(1);
 
 int* duty;
-float* angle_values = (float*) malloc(3*sizeof(float));
-float* error_angle_values = (float*) malloc(3*sizeof(float));
-float* angle_values_init = (float*) malloc(3*sizeof(float));
-float* error_angle_values_init = (float*) malloc(3*sizeof(float));
+float* angle_values = (float*) calloc(3,sizeof(float));
+float* error_angle_values = (float*) calloc(3,sizeof(float));
+float* angle_values_init = (float*) calloc(3,sizeof(float));
+float* error_angle_values_init = (float*) calloc(3,sizeof(float));
 
 // ================================================================
 // ===                      INITIAL SETUP                       ===
@@ -62,7 +62,7 @@ float* error_angle_values_init = (float*) malloc(3*sizeof(float));
 
 void setup() {
     Serial.begin(115200);
-    
+    Wire.begin();
     // Set pin modes
     pinMode(brake_x, OUTPUT);
     pinMode(brake_y, OUTPUT);
