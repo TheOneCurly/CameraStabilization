@@ -73,7 +73,7 @@ static int set_selection = 1;
 static int color_set = 3; //Green
 static int cursor_set = 2; //Right Waka (>)
 
-static bool in_UI = false;
+
 
 const uint8_t paw_bitmap[] PROGMEM = {
   0x00,         // 0 0 0 0 0 0 0 0 

@@ -421,22 +421,16 @@ void joystick_check(){
  *
  ******************************************************************************/
 void fwd_butt_handler(){
-    if(!in_UI){
-        int fwd = analogRead(FWD_BUTT);
-    
-        Serial.print("Front Butt\t");
-        Serial.println(fwd);
-    
-        if(fwd_butt_trig == 0 && fwd>= BUTT_PUSH){
-            fwd_butt_trig = 1;
-            cur_menu_page = 2;
+    int fwd = analogRead(FWD_BUTT);
 
-            in_UI = true;
-            draw();
-        }else if( fwd_butt_trig && fwd <= BUTT_PUSH){
-            fwd_butt_trig = 0;
-        }
+    Serial.print("Front Butt\t");
+    Serial.println(fwd);
+
+    if(fwd >= BUTT_PUSH){
+        cur_menu_page = 2;
+        in_UI = true;
     }
+
 }
 
 

@@ -25,4 +25,7 @@
 	static float xError, yError, zError;
 	static float xControl, yControl, zControl;
 	static float xDuty, yDuty, zDuty;
+
+	static bool in_UI = false;
+	
 #endif 
