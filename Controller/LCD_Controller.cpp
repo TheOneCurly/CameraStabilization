@@ -368,9 +368,9 @@ void fwd_butt_check(){
     Serial.print("Front Butt\t");
     Serial.println(fwd);
   
-    if(fwd >= BUTT_PUSH){
+    if(fwd == 0){
         next_move = cur_selection;
-        while(analogRead(FWD_BUTT) >= BUTT_PUSH);
+        while(analogRead(FWD_BUTT) == 0);
     }
 }
 
@@ -440,7 +440,7 @@ void fwd_butt_handler(){
     Serial.print("Front Butt\t");
     Serial.println(fwd);
 
-    if(fwd >= BUTT_PUSH){
+    if(fwd == 0){
         cur_menu_page = 2;
         in_UI = true;
     }
