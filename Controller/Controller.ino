@@ -69,9 +69,9 @@ float* error_angle_values_init = (float*) calloc(3,sizeof(float));
 
 void setup() {
     Serial.begin(115200);
-
-    initialize_LCD();
+    
     Wire.begin();
+    initialize_LCD();
 
     // Set pin modes
     pinMode(brake_x, OUTPUT);
@@ -92,14 +92,7 @@ void setup() {
     digitalWrite(enable_y, LOW);
     digitalWrite(enable_z, LOW);
     
-    attachInterrupt(IMU0Interrupt, dmp0DataReady, RISING);
-    attachInterrupt(IMU1Interrupt, dmp1DataReady, RISING);
-    
     attachInterrupt(FWD_BUTT, fwd_butt_handler, HIGH);
-    attachInterrupt(BCK_BUTT, bck_butt_handler, HIGH);
-    
-    attachInterrupt(JS_X, joystick_handler, HIGH);
-    attachInterrupt(JS_Y, joystick_handler, HIGH);
 
     bool imu_ready = false;
     bool imu_error_ready = false;

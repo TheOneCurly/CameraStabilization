@@ -101,9 +101,9 @@ void sys_init_complete(){
 void LCD_movement_handler(){
   
     //Check for user input/what the user has done.
-    joystick_handler();
-    fwd_butt_handler();
-    bck_butt_handler();
+    joystick_check();
+    fwd_butt_check();
+    bck_butt_check();
   
     //Handle user request  
     if(next_move > 0){

@@ -88,6 +88,7 @@ const uint8_t paw_bitmap[] PROGMEM = {
 //-----------------------------------------------------------------------------------\\
 
 //-----------------------------  LCD DISPLAY FUNCTIONS ------------------------------\\
+
 void initialize_LCD();
 void u8g_prepare();
 void sys_init_complete();
