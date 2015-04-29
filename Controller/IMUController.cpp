@@ -38,6 +38,7 @@ bool IMUController::init(){
 	lastUpdate = 0;
 	now = 0;
 	
+        Wire.begin();
 	// get values from global variables of same name defined in calibration.h
 	acc_off_x = ::acc_off_x;
 	acc_off_y = ::acc_off_y;

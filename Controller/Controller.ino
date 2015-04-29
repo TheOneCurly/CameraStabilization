@@ -1,7 +1,6 @@
+#include <Wire.h>
+
 #include <U8glib.h>
-
-
-
 /*
  *
  *	Controller.ino
@@ -48,9 +47,9 @@ customPWM motorPinz(PWM_pin_z);
 
 // Arduino Wire library is required if I2Cdev I2CDEV_ARDUINO_WIRE implementation
 // is used in I2Cdev.h
-#if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
-    #include "Wire.h"
-#endif
+//#if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
+//    #include "Wire.h"
+//#endif
 #include "LCD_Controller.h"
 #include "IMUController.h"
 
@@ -79,9 +78,9 @@ unsigned long start_test, end_test = 0;
 // ================================================================
 
 void setup() {
-    Serial.begin(115200);
     
-    Wire.begin();
+    Serial.begin(9600);
+    
     initialize_LCD();
     
     // Set pin modes
@@ -157,6 +156,8 @@ void setup() {
     pitch_error_start = error_angle_values[1];
     roll_error_start = error_angle_values[2];
     
+    Serial.println("Drift Calculations...");
+    
     delay(15000);
     
     // Poll to get YPR values after 5 seconds
@@ -181,34 +182,31 @@ void setup() {
     roll_error_end = error_angle_values[2];
     
     // Calculate drift of the YPR over 5 seconds
-    yaw_drift = (yaw_start - yaw_end) / 5000;
-    pitch_drift = (pitch_start - pitch_end) / 5000;
-    roll_drift = (roll_start - roll_end) / 5000; 
-    yaw_error_drift = (yaw_error_start - yaw_error_end) / 5000;
-    pitch_error_drift = (pitch_error_start - pitch_error_end) / 5000;
-    roll_error_drift = (roll_error_start - roll_error_end) / 5000;
+    yaw_drift = (yaw_start - yaw_end) / 15000;
+    pitch_drift = (pitch_start - pitch_end) / 15000;
+    roll_drift = (roll_start - roll_end) / 15000; 
+    yaw_error_drift = (yaw_error_start - yaw_error_end) / 15000;
+    pitch_error_drift = (pitch_error_start - pitch_error_end) / 15000;
+    roll_error_drift = (roll_error_start - roll_error_end) / 15000;
     
     end_time = millis();
     
-    Serial.print("Time = ");
-    Serial.println(end_time - start_time);
-    Serial.print(" Yaw Drift Amounts ");
-    Serial.print(yaw_drift);
-    Serial.print(" \t");
-    Serial.println(yaw_error_drift);   
-    Serial.print(" Pitch Drift Amounts ");
-    Serial.print(pitch_drift);
-    Serial.print(" \t");
-    Serial.println(pitch_error_drift);   
-    Serial.print(" Roll Drift Amounts ");
-    Serial.print(roll_drift);
-    Serial.print(" \t");
-    Serial.println(roll_error_drift);
-    
+//    Serial.print("Time = ");
+//    Serial.println(end_time - start_time);
+//    Serial.print(" Yaw Drift Amounts ");
+//    Serial.print(yaw_drift);
+//    Serial.print(" \t");
+//    Serial.println(yaw_error_drift);   
+//    Serial.print(" Pitch Drift Amounts ");
+//    Serial.print(pitch_drift);
+//    Serial.print(" \t");
+//    Serial.println(pitch_error_drift);   
+//    Serial.print(" Roll Drift Amounts ");
+//    Serial.print(roll_drift);
+//    Serial.print(" \t");
+//    Serial.println(roll_error_drift);
+
     sys_init_complete();
-    
-    //imu.poll(angle_values);
-    //imu_error.poll(error_angle_values);
     
     // Enable movement
     digitalWrite(enable_x, HIGH);
@@ -238,13 +236,13 @@ void loop() {
             duty = PIDMovementCalc_withError(angle_values, error_angle_values);
               
             // debug
-            Serial.print(F("duty cycles: \t"));                               
-            Serial.print(duty[0]);
-            Serial.print(F("\t"));
-            Serial.print(duty[1]);
-            Serial.print(F("\t"));
-            Serial.println(duty[2]);
-            Serial.println(F("")); 
+//            Serial.print(F("duty cycles: \t"));                               
+//            Serial.print(duty[0]);
+//            Serial.print(F("\t"));
+//            Serial.print(duty[1]);
+//            Serial.print(F("\t"));
+//            Serial.println(duty[2]);
+//            Serial.println(F("")); 
               
             //set duty cycles
             motorPinx.duty(duty[0]);

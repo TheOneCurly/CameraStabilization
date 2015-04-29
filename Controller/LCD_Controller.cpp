@@ -81,8 +81,8 @@ void u8g_prepare(){
  *
  ******************************************************************************/
 void sys_init_complete(){
+    Serial.println("Sys init");
     cur_menu_page = 1;
-
     LCD_movement_handler( 1 );
 
 }
@@ -100,31 +100,34 @@ bool LCD_movement_handler(int special){
   
     bool return_val = true;
     
+    Serial.print("LCD handler: ");
+    Serial.println(special);
+    
     if(special == 0){
         //Check for user input/what the user has done.
         joystick_check();
         fwd_butt_check();
         bck_butt_check();
+          
+        //Handle user request  
+        if(next_move > 0){
+            //Triggered by FWD being selected
+            handle_select( cur_selection );
+        }else if (next_move == 0 && cur_menu_page > 2){
+            // Triggered by BCK being selected while not 
+            // on the home screen.
+            cur_menu_page = 2;
+            cur_selection = HOME_BASE; 
+            cur_sel_min = HOME_BASE;
+            cur_sel_max = HOME_MAX;
+            enable_side_scroll = 0; 
+        }else if (next_move == 0){
+            //Triggered by being on the home screen, exit UI mode.
+            cur_menu_page = 1;
+            return_val = false;
+        }
     }
-  
-    //Handle user request  
-    if(next_move > 0){
-        //Triggered by FWD being selected
-        handle_select( cur_selection );
-    }else if (next_move == 0 && cur_menu_page > 2){
-        // Triggered by BCK being selected while not 
-        // on the home screen.
-        cur_menu_page = 2;
-        cur_selection = HOME_BASE; 
-        cur_sel_min = HOME_BASE;
-        cur_sel_max = HOME_MAX;
-        enable_side_scroll = 0; 
-    }else if (next_move == 0){
-        //Triggered by being on the home screen, exit UI mode.
-        cur_menu_page = 1;
-        return_val = false;
-    }
-  
+    
     u8g.firstPage();  
     do {
         draw();
@@ -323,6 +326,9 @@ void draw_settings(){
  *
  ******************************************************************************/
 void draw(){
+    Serial.print("Draw: ");
+    Serial.println(cur_menu_page);
+    
     u8g_prepare();
     switch( cur_menu_page ) {
         case 0: draw_init(); break;

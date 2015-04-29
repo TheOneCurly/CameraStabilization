@@ -1,3 +1,5 @@
+#include <Wire.h>
+
 /*============================================================================================
 
 
@@ -12,9 +14,7 @@
 #ifndef _IMU_CONTROL_H_
 #define _IMU_CONTROL_H_
 
-#include "MPU6050_6Axis_MotionApps20.h"
-
-#include <Wire.h>
+//#include "MPU6050_6Axis_MotionApps20.h"
 #include "Arduino.h"
 #include "calibration.h"
 //#include <EEPROM.h>

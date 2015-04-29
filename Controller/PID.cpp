@@ -34,7 +34,11 @@ const int MOTOR_FULL_FWD_DUTY = 100;
 const int MOTOR_HALF_REV_DUTY = 25;
 const int MOTOR_FULL_REV_DUTY = 0;
 
-const int ANGLE_THRESHOLD = 10;
+const int X_MAX_ANGLE = 90;
+const int Y_MAX_ANGLE = 90;
+const int Z_MAX_ANGLE = 90;
+
+const int ANGLE_THRESHOLD = 2;
 
 static int system_weight = 800;
 static int system_power = 100;
@@ -122,7 +126,7 @@ int* PIDMovementCalc_withError(float* angles, float* errorAngles){
     zErrorSum += zError*(t-t_last);
     
     // X-axis
-    if(X_control_en && xControl < 10 && xControl > -10 && xError < 160 && xError > -160){
+    if(X_control_en && xControl < ANGLE_THRESHOLD && xControl > -ANGLE_THRESHOLD && xError < X_MAX_ANGLE && xError > -X_MAX_ANGLE){
         xDuty = kp*xError + ki*xErrorSum;
         xDuty = constrain(xDuty, -100, 100);
         dutyCycles[0] = map(xDuty, -100, 100, 0, 100);
@@ -136,7 +140,7 @@ int* PIDMovementCalc_withError(float* angles, float* errorAngles){
     }
     
     // Y-axis
-    if(Y_control_en && yControl < 10 && yControl > -10 && yError < 160 && yError > -160){
+    if(Y_control_en && yControl < ANGLE_THRESHOLD && yControl > -ANGLE_THRESHOLD && yError < Y_MAX_ANGLE && yError > -Y_MAX_ANGLE){
         yDuty = kp*yError+ ki*yErrorSum;
         yDuty = constrain(yDuty, -100, 100);
         dutyCycles[1] = map(yDuty, -100, 100, 0, 100);
@@ -150,7 +154,7 @@ int* PIDMovementCalc_withError(float* angles, float* errorAngles){
     }
     
     // Z-axis
-    if(Z_control_en && zControl < 10 && zControl > -10 && zError < 50 && zError > -50){
+    if(Z_control_en && zControl < ANGLE_THRESHOLD && zControl > -ANGLE_THRESHOLD && zError < Z_MAX_ANGLE && zError > -Z_MAX_ANGLE){
         zDuty = kp*zError+ ki*zErrorSum;
         zDuty = constrain(zDuty, -100, 100);
         dutyCycles[2] = map(zDuty, -100, 100, 0, 100);
