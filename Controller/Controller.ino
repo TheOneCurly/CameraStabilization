@@ -14,7 +14,7 @@
 #include "PID.h"
 #include "customPWM.h"
 
-const float ANGLE_INIT_THRESHOLD = 0.2;
+const float ANGLE_INIT_THRESHOLD = 0.01;
 
 // declare pins
 const int PWM_pin_x = 7;
@@ -55,6 +55,15 @@ float* angle_values = (float*) calloc(3,sizeof(float));
 float* error_angle_values = (float*) calloc(3,sizeof(float));
 float* angle_values_init = (float*) calloc(3,sizeof(float));
 float* error_angle_values_init = (float*) calloc(3,sizeof(float));
+float* base_angles_updated = (float*) calloc(3,sizeof(float));
+float* base_error_angles_updated = (float*) calloc(3,sizeof(float));
+
+float yaw_start, yaw_error_start, yaw_end, yaw_error_end, yaw_drift, yaw_error_drift = 0;
+float pitch_start, pitch_error_start, pitch_end, pitch_error_end, pitch_drift, pitch_error_drift = 0;
+float roll_start, roll_error_start, roll_end, roll_error_end, roll_drift, roll_error_drift = 0;
+
+unsigned long start_time, end_time = 0;
+unsigned long start_test, end_test = 0;
 
 // ================================================================
 // ===                      INITIAL SETUP                       ===
@@ -86,12 +95,15 @@ void setup() {
     bool imu_error_ready = false;
     bool imu_valid = false;
     bool imu_error_valid = false;
-    
+     
     imu.init();
-    imu.poll(angle_values);
-    
     imu_error.init();
-    imu_error.poll(error_angle_values);
+    
+    start_time = millis();
+    while( ( millis() - start_time ) < 45000 ) {
+      imu.poll(angle_values);
+      imu_error.poll(error_angle_values);
+    }
     
     while(!imu_ready || !imu_error_ready){
       delay(15); // needs small delay for init DO NOT REMOVE >:( 
@@ -109,19 +121,79 @@ void setup() {
       imu_error_valid = imu_error.poll(error_angle_values);
       
       if(imu_valid && !imu_ready){ 
-        if((abs(angle_values[0] - angle_values_init[0])<ANGLE_INIT_THRESHOLD && abs(angle_values[1] - angle_values_init[1])<ANGLE_INIT_THRESHOLD && abs(angle_values[2] - angle_values_init[2])<ANGLE_INIT_THRESHOLD)){
-          setBaseAngles(angle_values,0);
+        if((/*abs(angle_values[0] - angle_values_init[0])<ANGLE_INIT_THRESHOLD &&*/ abs(angle_values[1] - angle_values_init[1])<ANGLE_INIT_THRESHOLD && abs(angle_values[2] - angle_values_init[2])<ANGLE_INIT_THRESHOLD)){
           imu_ready = true;
         }
       }
       
       if(imu_error_valid && !imu_error_ready){
-        if((abs(error_angle_values[0] - error_angle_values_init[0])<ANGLE_INIT_THRESHOLD && abs(error_angle_values[1] - error_angle_values_init[1])<ANGLE_INIT_THRESHOLD && abs(error_angle_values[2] - error_angle_values_init[2])<ANGLE_INIT_THRESHOLD)){
-          setBaseAngles(error_angle_values,1);
+        if((/*abs(error_angle_values[0] - error_angle_values_init[0])<ANGLE_INIT_THRESHOLD &&*/ abs(error_angle_values[1] - error_angle_values_init[1])<ANGLE_INIT_THRESHOLD && abs(error_angle_values[2] - error_angle_values_init[2])<ANGLE_INIT_THRESHOLD)){
           imu_error_ready = true;
         }
       }
     }
+    
+    // Poll to get YPR values for calculating drift
+    imu.poll(angle_values);
+    imu_error.poll(error_angle_values);
+    
+    // Set the YPR start values
+    yaw_start = angle_values[0];
+    pitch_start = angle_values[1];
+    roll_start = angle_values[2];
+    yaw_error_start =  error_angle_values[0];
+    pitch_error_start = error_angle_values[1];
+    roll_error_start = error_angle_values[2];
+    
+    delay(15000);
+    
+    // Poll to get YPR values after 5 seconds
+    imu.poll(angle_values);
+    imu_error.poll(error_angle_values);
+    
+    // Set Base Angles
+    base_angles_updated = angle_values;
+    base_error_angles_updated = error_angle_values;
+    
+    setBaseAngles(base_angles_updated,0);
+    setBaseAngles(base_error_angles_updated,1);
+    
+    start_time = millis();
+    
+    // Set the YPR end values
+    yaw_end = angle_values[0];
+    pitch_end = angle_values[1];
+    roll_end = angle_values[2];
+    yaw_error_end = error_angle_values[0];
+    pitch_error_end = error_angle_values[1];
+    roll_error_end = error_angle_values[2];
+    
+    // Calculate drift of the YPR over 5 seconds
+    yaw_drift = (yaw_start - yaw_end) / 5000;
+    pitch_drift = (pitch_start - pitch_end) / 5000;
+    roll_drift = (roll_start - roll_end) / 5000; 
+    yaw_error_drift = (yaw_error_start - yaw_error_end) / 5000;
+    pitch_error_drift = (pitch_error_start - pitch_error_end) / 5000;
+    roll_error_drift = (roll_error_start - roll_error_end) / 5000;
+    
+    end_time = millis();
+    
+    Serial.print("Time = ");
+    Serial.println(end_time - start_time);
+    Serial.print(" Yaw Drift Amounts ");
+    Serial.print(yaw_drift);
+    Serial.print(" \t");
+    Serial.println(yaw_error_drift);   
+    Serial.print(" Pitch Drift Amounts ");
+    Serial.print(pitch_drift);
+    Serial.print(" \t");
+    Serial.println(pitch_error_drift);   
+    Serial.print(" Roll Drift Amounts ");
+    Serial.print(roll_drift);
+    Serial.print(" \t");
+    Serial.println(roll_error_drift);    
+    //imu.poll(angle_values);
+    //imu_error.poll(error_angle_values);
     
     // Enable movement
     digitalWrite(enable_x, HIGH);
@@ -139,6 +211,8 @@ void setup() {
 
 void loop() {
     //get angles from poll
+    start_test = millis();
+    
     base_imu_flag = imu.poll(angle_values);
     error_imu_flag = imu_error.poll(error_angle_values);
 
@@ -162,6 +236,29 @@ void loop() {
       motorPinz.duty(duty[2]);
       
       free(duty);
+      
+      end_test = millis();
+      
+      base_angles_updated[0] = base_angles_updated[0] + ((end_test-start_test)* yaw_drift);
+      base_error_angles_updated[0] = base_error_angles_updated[0]  + ((end_test-start_test)* yaw_error_drift);
+      base_angles_updated[1] = base_angles_updated[1] + ((end_test-start_test)* pitch_drift);
+      base_error_angles_updated[1] = base_error_angles_updated[1]  + ((end_test-start_test)* pitch_error_drift);
+      base_angles_updated[2] = base_angles_updated[2] + ((end_test-start_test)* roll_drift);
+      base_error_angles_updated[2] = base_error_angles_updated[2]  + ((end_test-start_test)* roll_error_drift);
+      
+      Serial.print("Base Angles Updated: \t");
+      Serial.print(base_angles_updated[0]);
+      Serial.print("\t");
+      Serial.print(base_angles_updated[1]);
+      Serial.print("\t");
+      Serial.println(base_angles_updated[2]);
+      Serial.print("Base Error Angles Updated: \t");
+      Serial.print(base_error_angles_updated[0]);
+      Serial.print("\t");
+      Serial.print(base_error_angles_updated[1]);
+      Serial.print("\t");
+      Serial.println(base_error_angles_updated[2]);
+      
       //repeat
     }
     else{
