@@ -1,3 +1,7 @@
+#include <U8glib.h>
+
+
+
 /*
  *
  *	Controller.ino
@@ -13,6 +17,7 @@
  
 #include "PID.h"
 #include "customPWM.h"
+#include "Variables.h"
 
 const float ANGLE_INIT_THRESHOLD = 0.01;
 
@@ -20,6 +25,7 @@ const float ANGLE_INIT_THRESHOLD = 0.01;
 const int PWM_pin_x = 7;
 const int brake_x = 3;
 const int enable_x = 2;
+
 
 const int PWM_pin_y = 8;
 const int brake_y = 5;
@@ -45,10 +51,13 @@ customPWM motorPinz(PWM_pin_z);
 #if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
     #include "Wire.h"
 #endif
-
+#include "LCD_Controller.h"
 #include "IMUController.h"
+
 IMUController imu(0);
 IMUController imu_error(1);
+
+
 
 int* duty;
 float* angle_values = (float*) calloc(3,sizeof(float));
@@ -71,7 +80,10 @@ unsigned long start_test, end_test = 0;
 
 void setup() {
     Serial.begin(115200);
+    
     Wire.begin();
+    initialize_LCD();
+    
     // Set pin modes
     pinMode(brake_x, OUTPUT);
     pinMode(brake_y, OUTPUT);
@@ -101,36 +113,36 @@ void setup() {
     
     start_time = millis();
     while( ( millis() - start_time ) < 45000 ) {
-      imu.poll(angle_values);
-      imu_error.poll(error_angle_values);
+        imu.poll(angle_values);
+        imu_error.poll(error_angle_values);
     }
     
     while(!imu_ready || !imu_error_ready){
-      delay(15); // needs small delay for init DO NOT REMOVE >:( 
-      imu_valid = false;
-      imu_error_valid = false;
-      angle_values_init[0] = angle_values[0];
-      angle_values_init[1] = angle_values[1];
-      angle_values_init[2] = angle_values[2];
-     
-      error_angle_values_init[0] = error_angle_values[0];
-      error_angle_values_init[1] = error_angle_values[1];
-      error_angle_values_init[2] = error_angle_values[2];
-      
-      imu_valid = imu.poll(angle_values);
-      imu_error_valid = imu_error.poll(error_angle_values);
-      
-      if(imu_valid && !imu_ready){ 
-        if((/*abs(angle_values[0] - angle_values_init[0])<ANGLE_INIT_THRESHOLD &&*/ abs(angle_values[1] - angle_values_init[1])<ANGLE_INIT_THRESHOLD && abs(angle_values[2] - angle_values_init[2])<ANGLE_INIT_THRESHOLD)){
-          imu_ready = true;
+        delay(15); // needs small delay for init DO NOT REMOVE >:( 
+        imu_valid = false;
+        imu_error_valid = false;
+        angle_values_init[0] = angle_values[0];
+        angle_values_init[1] = angle_values[1];
+        angle_values_init[2] = angle_values[2];
+         
+        error_angle_values_init[0] = error_angle_values[0];
+        error_angle_values_init[1] = error_angle_values[1];
+        error_angle_values_init[2] = error_angle_values[2];
+          
+        imu_valid = imu.poll(angle_values);
+        imu_error_valid = imu_error.poll(error_angle_values);
+          
+        if(imu_valid && !imu_ready){
+            if((/*abs(angle_values[0] - angle_values_init[0])<ANGLE_INIT_THRESHOLD &&*/ abs(angle_values[1] - angle_values_init[1])<ANGLE_INIT_THRESHOLD && abs(angle_values[2] - angle_values_init[2])<ANGLE_INIT_THRESHOLD)){
+                imu_ready = true;
+            }
         }
-      }
-      
-      if(imu_error_valid && !imu_error_ready){
-        if((/*abs(error_angle_values[0] - error_angle_values_init[0])<ANGLE_INIT_THRESHOLD &&*/ abs(error_angle_values[1] - error_angle_values_init[1])<ANGLE_INIT_THRESHOLD && abs(error_angle_values[2] - error_angle_values_init[2])<ANGLE_INIT_THRESHOLD)){
-          imu_error_ready = true;
+          
+        if(imu_error_valid && !imu_error_ready){
+            if((/*abs(error_angle_values[0] - error_angle_values_init[0])<ANGLE_INIT_THRESHOLD &&*/ abs(error_angle_values[1] - error_angle_values_init[1])<ANGLE_INIT_THRESHOLD && abs(error_angle_values[2] - error_angle_values_init[2])<ANGLE_INIT_THRESHOLD)){
+                imu_error_ready = true;
+            }
         }
-      }
     }
     
     // Poll to get YPR values for calculating drift
@@ -191,7 +203,10 @@ void setup() {
     Serial.print(" Roll Drift Amounts ");
     Serial.print(roll_drift);
     Serial.print(" \t");
-    Serial.println(roll_error_drift);    
+    Serial.println(roll_error_drift);
+    
+    sys_init_complete();
+    
     //imu.poll(angle_values);
     //imu_error.poll(error_angle_values);
     
@@ -210,59 +225,68 @@ void setup() {
 // ================================================================
 
 void loop() {
-    //get angles from poll
-    start_test = millis();
-    
-    base_imu_flag = imu.poll(angle_values);
-    error_imu_flag = imu_error.poll(error_angle_values);
-
-    //pid returns 3 duty cycles
-    //ignore cases where there was a fifo overflow
-    if( error_imu_flag && base_imu_flag ){
-      duty = PIDMovementCalc_withError(angle_values, error_angle_values);
-      
-     // debug
-      Serial.print(F("duty cycles: \t"));                               
-      Serial.print(duty[0]);
-      Serial.print(F("\t"));
-      Serial.print(duty[1]);
-      Serial.print(F("\t"));
-      Serial.println(duty[2]);
-      Serial.println(F(""));
-      
-      //set duty cycles
-      motorPinx.duty(duty[0]);
-      motorPiny.duty(duty[1]);
-      motorPinz.duty(duty[2]);
-      
-      free(duty);
-      
-      end_test = millis();
-      
-      base_angles_updated[0] = base_angles_updated[0] + ((end_test-start_test)* yaw_drift);
-      base_error_angles_updated[0] = base_error_angles_updated[0]  + ((end_test-start_test)* yaw_error_drift);
-      base_angles_updated[1] = base_angles_updated[1] + ((end_test-start_test)* pitch_drift);
-      base_error_angles_updated[1] = base_error_angles_updated[1]  + ((end_test-start_test)* pitch_error_drift);
-      base_angles_updated[2] = base_angles_updated[2] + ((end_test-start_test)* roll_drift);
-      base_error_angles_updated[2] = base_error_angles_updated[2]  + ((end_test-start_test)* roll_error_drift);
-      
-      Serial.print("Base Angles Updated: \t");
-      Serial.print(base_angles_updated[0]);
-      Serial.print("\t");
-      Serial.print(base_angles_updated[1]);
-      Serial.print("\t");
-      Serial.println(base_angles_updated[2]);
-      Serial.print("Base Error Angles Updated: \t");
-      Serial.print(base_error_angles_updated[0]);
-      Serial.print("\t");
-      Serial.print(base_error_angles_updated[1]);
-      Serial.print("\t");
-      Serial.println(base_error_angles_updated[2]);
-      
-      //repeat
-    }
-    else{
-      Serial.println(F("Something went wrong in retreiving IMU data"));
+    if(in_UI == 0){
+        //get angles from poll
+        start_test = millis();
+        
+        base_imu_flag = imu.poll(angle_values);
+        error_imu_flag = imu_error.poll(error_angle_values);
+        
+        //pid returns 3 duty cycles
+        //ignore cases where there was a fifo overflow
+        if( error_imu_flag && base_imu_flag ){
+            duty = PIDMovementCalc_withError(angle_values, error_angle_values);
+              
+            // debug
+            Serial.print(F("duty cycles: \t"));                               
+            Serial.print(duty[0]);
+            Serial.print(F("\t"));
+            Serial.print(duty[1]);
+            Serial.print(F("\t"));
+            Serial.println(duty[2]);
+            Serial.println(F("")); 
+              
+            //set duty cycles
+            motorPinx.duty(duty[0]);
+            motorPiny.duty(duty[1]);
+            motorPinz.duty(duty[2]);
+            free(duty);
+              
+            end_test = millis();
+              
+            base_angles_updated[0] = base_angles_updated[0] + ((end_test-start_test)* yaw_drift);
+            base_error_angles_updated[0] = base_error_angles_updated[0]  + ((end_test-start_test)* yaw_error_drift);
+            base_angles_updated[1] = base_angles_updated[1] + ((end_test-start_test)* pitch_drift);
+            base_error_angles_updated[1] = base_error_angles_updated[1]  + ((end_test-start_test)* pitch_error_drift);
+            base_angles_updated[2] = base_angles_updated[2] + ((end_test-start_test)* roll_drift);
+            base_error_angles_updated[2] = base_error_angles_updated[2]  + ((end_test-start_test)* roll_error_drift);
+              
+            Serial.print("Base Angles Updated: \t");
+            Serial.print(base_angles_updated[0]);
+            Serial.print("\t");
+            Serial.print(base_angles_updated[1]);
+            Serial.print("\t");
+            Serial.println(base_angles_updated[2]);
+            Serial.print("Base Error Angles Updated: \t");
+            Serial.print(base_error_angles_updated[0]);
+            Serial.print("\t");
+            Serial.print(base_error_angles_updated[1]);
+            Serial.print("\t");
+            Serial.println(base_error_angles_updated[2]);
+          
+        }else{
+            Serial.println(F("Something went wrong in retreiving IMU data"));
+        }
+        
+        in_UI = fwd_butt_handler();
+    }else{
+        //set duty cycles
+        motorPinx.duty(50);
+        motorPiny.duty(50);
+        motorPinz.duty(50);
+        
+        //stop using the IMU, focus on only the LCD interface.
+        in_UI = LCD_movement_handler(0);
     }
 }
 
