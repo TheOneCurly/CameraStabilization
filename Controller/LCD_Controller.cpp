@@ -32,6 +32,13 @@ static int fwd_butt_trig = 0;
 static U8GLIB_LM6059_2X u8g(21, 18, 28, 32, 30);
 
 
+/*******************************************************************************
+ * initialize_LCD
+ *
+ * Enables background LEDs for the display, sets initial navigation variable 
+ * values. Also draws the initialization screen.
+ *
+ ******************************************************************************/
 void initialize_LCD(){
 
     //Initialize colored backlight pins
@@ -55,6 +62,13 @@ void initialize_LCD(){
 }
 
 
+/*******************************************************************************
+ * u8g_prepare
+ *
+ * Sets up LCD display variables for printing, including font, font height
+ * and other display characteristics.
+ *
+ ******************************************************************************/
 void u8g_prepare(){
     u8g.setFont(u8g_font_6x10);
     u8g.setFontRefHeightExtendedText();
@@ -63,12 +77,27 @@ void u8g_prepare(){
 }
 
 
+/*******************************************************************************
+ * sys_init_complete
+ *
+ * Only called by the main controller program when system initialization is 
+ * complete. Changes menu to display system info.
+ *
+ ******************************************************************************/
 void sys_init_complete(){
     cur_menu_page = 1;
     draw();
 }
 
 
+/*******************************************************************************
+ * LCD_movement_handler
+ *
+ * Once UI navigation is enabled, this function is used to check for any joystick
+ * or button input, then handles the resulting action desired. If no action is
+ * requested, the screen just refreshes and updates.
+ *
+ ******************************************************************************/
 void LCD_movement_handler(){
   
     //Check for user input/what the user has done.
@@ -103,6 +132,16 @@ void LCD_movement_handler(){
 }
 
 
+/*******************************************************************************
+ * draw_cursor
+ *
+ * Uses the index provided to draw the cursor next to the currently selected
+ * menu option. 
+ *
+ * @param  cur_menu_index - the current item selected in the menu, set by menu
+ *                          calling the function. 
+ *
+ ******************************************************************************/
 void draw_cursor( int cur_menu_index ){
     switch( cursor_set ){
         case 2: u8g.drawStr(0, cur_menu_index*MENU_HEIGHT, ">"); break;
@@ -111,6 +150,12 @@ void draw_cursor( int cur_menu_index ){
 }
 
 
+/*******************************************************************************
+ * draw_init
+ * 
+ * Draws the notice that the system is initializing to the LCD.
+ *
+ ******************************************************************************/
 void draw_init(){
     u8g.drawStr(0, MENU_HEIGHT,   "----------------------");
     u8g.drawStr(0, 2*MENU_HEIGHT, "  INITIALIZING SYSTEM ");
@@ -119,6 +164,13 @@ void draw_init(){
 }
 
 
+/*******************************************************************************
+ * draw_sys
+ *
+ * Draws the system info display, uses values provided by the control algorithm
+ * through Variables.h to show the current angles of the upper and lower IMUs.
+ *
+ ******************************************************************************/
 void draw_sys(){
     u8g.drawStr(0, 0, "----- SYSTEM INFO ----");
     u8g.drawStr(0, MENU_HEIGHT, "TOP IMU    BOTTOM IMU"); 
@@ -135,6 +187,13 @@ void draw_sys(){
 }
 
 
+/*******************************************************************************
+ * draw_home
+ * 
+ * Draws the home screen that will allow the user to navigate to the axis
+ * lock/unlock screens, system settings, and back to system info display.
+ *
+ ******************************************************************************/
 void draw_home(){
     draw_cursor(cur_selection + 1);
     u8g.drawStr(0, 0, "-------- HOME --------");
@@ -145,6 +204,17 @@ void draw_home(){
 }
 
 
+/*******************************************************************************
+ * draw_axis_select
+ * 
+ * Draws the display that allows the user to lock or unlock an axis. Display 
+ * changes based on the current state of the axis. Axis status is pulled from 
+ * control program via Variables.h.
+ *
+ * Lock - Stabilized
+ * Unlock - free floating
+ *
+ ******************************************************************************/
 void draw_axis_select(){
     draw_cursor(cur_selection - 18);
     u8g.drawStr(0, 0, "-- AXIS UNLOCK/LOCK --");
@@ -172,6 +242,12 @@ void draw_axis_select(){
 }
 
 
+/*******************************************************************************
+ * draw_settings
+ * 
+ * Draws the UI settings menu. Modifies display as user manipulates the joystick.
+ *
+ ******************************************************************************/
 void draw_settings(){
     draw_cursor( cur_selection - 76);
     u8g.drawStr(0, MENU_HEIGHT,   "------ SETTINGS ------");
@@ -221,6 +297,12 @@ void draw_settings(){
 }
 
 
+/*******************************************************************************
+ * draw
+ * 
+ * Handles redrawing the display based on a global variable cur_menu_page.
+ *
+ ******************************************************************************/
 void draw(){
     u8g_prepare();
     switch( cur_menu_page ) {
@@ -230,10 +312,17 @@ void draw(){
         case 3: draw_settings(); break;
         case 10: draw_axis_select(); break;          
   }
-
 }
 
 
+/*******************************************************************************
+ * bck_butt_check
+ * 
+ * Checks to see if the back button is pressed by determining is the button line
+ * has gone high. If this is the case, the system is notified that the menu should
+ * navigate up a page.
+ *
+ ******************************************************************************/
 void bck_butt_check(){
     int bck = analogRead(BCK_BUTT);
 
@@ -247,6 +336,14 @@ void bck_butt_check(){
 }
 
 
+/*******************************************************************************
+ * fwd_butt_check
+ * 
+ * Checks to see if the forward button is pressed by determining is the button line
+ * has gone high. If this is the case, the system is notified that the menu should
+ * navigate down a page.
+ *
+ ******************************************************************************/
 void fwd_butt_check(){
     int fwd = analogRead(FWD_BUTT);
   
@@ -260,6 +357,14 @@ void fwd_butt_check(){
 }
 
 
+/*******************************************************************************
+ * joystick_check
+ * 
+ * Checks to see the current state of the joystick. If the joystick has moved away
+ * from the center position, the movement is recorded and the cursor is moved or 
+ * highlighted settings option is changed.
+ *
+ ******************************************************************************/
 void joystick_check(){
     //Read the two potentiometer values for the joystick
     int x = analogRead(JS_X);
@@ -303,6 +408,14 @@ void joystick_check(){
 }
 
 
+/*******************************************************************************
+ * fwd_butt_handler
+ *
+ * Special forward button handler for the interrupt flag that will enter the user
+ * into being able to manipulate the UI. Should only be enabled and called when 
+ * the user is not in the UI.
+ *
+ ******************************************************************************/
 void fwd_butt_handler(){
     if(!in_UI){
         int fwd = analogRead(FWD_BUTT);
@@ -323,6 +436,16 @@ void fwd_butt_handler(){
 }
 
 
+/*******************************************************************************
+ * handle_select
+ * 
+ * Takes in the menu option selected, updates navigation variables that will 
+ * control/limit the UI.
+ * 
+ * @param next_move - selected menu option
+ *
+ *
+ ******************************************************************************/
 void handle_select( int next_move ){
     switch(next_move){
 //-----------------AXIS CONTROL --------------------------//  
@@ -363,6 +486,15 @@ void handle_select( int next_move ){
 }
 
 
+/*******************************************************************************
+ * set_background_color
+ * 
+ * Changes the display background color based on what the user selects in the 
+ * settings menu
+ *
+ * @param color - desired color selected in the UI 
+ *
+ ******************************************************************************/
 void set_background_color( int color ){
   //-- Set the opposite of what you want HIGH 
   //--- (ie. if you want green set blue and red high, and green low.
@@ -401,8 +533,23 @@ void set_background_color( int color ){
 }
 
 
+/*******************************************************************************
+ * unlock_axis
+ * 
+ * Locks or unlocks an axis by manipulating shared variables in Variables.h that
+ * will be checked by the controller algorithm
+ *
+ * Lock - Stabilized
+ * Unlock - free floating
+ *
+ * @param  axis - determines which axis to lock/unlock.
+ *                1 - X Axis
+ *                2 - Y Axis
+ *                3 - Z Axis
+ *
+ ******************************************************************************/
 void unlock_axis( int axis ){
-        switch(axis){
+    switch(axis){
         case 1: X_control_en = !X_control_en;
                 break;
         case 2: Y_control_en = !Y_control_en;
