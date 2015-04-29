@@ -24,13 +24,7 @@
 
 static int fwd_butt_trig = 0;
 
-//Initialize the LCD Display
-// pin 21 - Serial clock out (SCLK)
-// pin 18 - Serial data out (SID)
-// pin 28 - LCD chip select (CS)
-// pin 32 - Data/Command select (RS or A0)
-// pin 30 - LCD reset (RST)
-static U8GLIB_LM6059_2X u8g(21, 18, 28, 32, 30);
+
 
 
 /*******************************************************************************
@@ -59,7 +53,11 @@ void initialize_LCD(){
     next_move = -1;
   
     //Display the initialization screen
-    draw();
+    //draw();
+    u8g.firstPage();  
+    do {
+        draw();
+    } while( u8g.nextPage() );
 }
 
 
@@ -87,7 +85,12 @@ void u8g_prepare(){
  ******************************************************************************/
 void sys_init_complete(){
     cur_menu_page = 1;
-    draw();
+
+    u8g.firstPage();  
+    do {
+        draw();
+    } while( u8g.nextPage() );
+    //draw();
 }
 
 
@@ -158,10 +161,10 @@ void draw_cursor( int cur_menu_index ){
  *
  ******************************************************************************/
 void draw_init(){
-    u8g.drawStr(0, MENU_HEIGHT,   "----------------------");
-    u8g.drawStr(0, 2*MENU_HEIGHT, "  INITIALIZING SYSTEM ");
-    u8g.drawStr(0, 3*MENU_HEIGHT, "   PLEASE HOLD STILL  ");
-    u8g.drawStr(0, 4*MENU_HEIGHT, "----------------------");
+    u8g.drawStr(0, 2*MENU_HEIGHT, "----------------------");
+    u8g.drawStr(0, 3*MENU_HEIGHT, " INITIALIZING SYSTEM ");
+    u8g.drawStr(0, 4*MENU_HEIGHT, "   PLEASE HOLD STILL  ");
+    u8g.drawStr(0, 5*MENU_HEIGHT, "----------------------");
 }
 
 
@@ -173,21 +176,32 @@ void draw_init(){
  *
  ******************************************************************************/
 void draw_sys(){
+    char buf[5];
     u8g.drawStr(0, 0, "----- SYSTEM INFO ----");
     u8g.drawStr(0, MENU_HEIGHT, "TOP IMU    BOTTOM IMU");
-    u8g.drawStr(0, 2*MENU_HEIGHT, " X:"); 
-    //u8g.drawStr(0, 2*MENU_HEIGHT, " X:" + round(xControl)); 
-    //u8g.drawStr(0, 2*MENU_HEIGHT, "            X:" + round(xError)); 
 
-    u8g.drawStr(0, 3*MENU_HEIGHT, " Y:"); 
-    //u8g.drawStr(0, 3*MENU_HEIGHT, " Y:"+ round(yControl)); 
-    //u8g.drawStr(0, 3*MENU_HEIGHT, "            Y:"+ round(yError)); 
+    //X
+    u8g.drawStr(0, 2*MENU_HEIGHT, " X:" );
+    u8g.drawStr(MENU_INDENT, 2*MENU_HEIGHT, itoa(round(xControl), buf, 10)); 
+
+    u8g.drawStr(5*MENU_INDENT, 2*MENU_HEIGHT, "X:" );
+    u8g.drawStr(6*MENU_INDENT, 2*MENU_HEIGHT, itoa(round(xError), buf, 10));
+
+    //Y
+    u8g.drawStr(0, 3*MENU_HEIGHT, " Y:" );
+    u8g.drawStr(MENU_INDENT, 3*MENU_HEIGHT, itoa(round(yControl), buf, 10)); 
+
+    u8g.drawStr(5*MENU_INDENT, 3*MENU_HEIGHT, "Y:" );
+    u8g.drawStr(6*MENU_INDENT, 3*MENU_HEIGHT, itoa(round(yError), buf, 10)); 
+
+    //Z
+    u8g.drawStr(0, 4*MENU_HEIGHT, " Z:" );
+    u8g.drawStr(MENU_INDENT, 4*MENU_HEIGHT, itoa(round(zControl), buf, 10)); 
+
+    u8g.drawStr(5*MENU_INDENT, 4*MENU_HEIGHT, "Z:" );
+    u8g.drawStr(6*MENU_INDENT, 4*MENU_HEIGHT, itoa(round(zError), buf, 10)); 
     
-    u8g.drawStr(0, 4*MENU_HEIGHT, " Z:"); 
-    //u8g.drawStr(0, 4*MENU_HEIGHT, " Z:"+ zControl)); 
-    //u8g.drawStr(0, 4*MENU_HEIGHT, "            Z:"+ round(zError)); 
-
-    u8g.drawStr(0, 5*MENU_HEIGHT, "PRESS FWD TO ENTER UI");
+    u8g.drawStr(0, 6*MENU_HEIGHT, "PRESS FWD TO ENTER UI");
 }
 
 

@@ -50,12 +50,13 @@ customPWM motorPinz(PWM_pin_z);
 #if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
     #include "Wire.h"
 #endif
-
+#include "LCD_Controller.h"
 #include "IMUController.h"
+
 IMUController imu(0);
 IMUController imu_error(1);
 
-#include "LCD_Controller.h"
+
 
 int* duty;
 float* angle_values = (float*) calloc(3,sizeof(float));
@@ -74,75 +75,75 @@ void setup() {
     initialize_LCD();
 
     // Set pin modes
-    pinMode(brake_x, OUTPUT);
-    pinMode(brake_y, OUTPUT);
-    pinMode(brake_z, OUTPUT);
+    // pinMode(brake_x, OUTPUT);
+    // pinMode(brake_y, OUTPUT);
+    // pinMode(brake_z, OUTPUT);
     
-    pinMode(enable_x, OUTPUT);
-    pinMode(enable_y, OUTPUT);
-    pinMode(enable_z, OUTPUT);
+    // pinMode(enable_x, OUTPUT);
+    // pinMode(enable_y, OUTPUT);
+    // pinMode(enable_z, OUTPUT);
     
-    // Release brakes
-    digitalWrite(brake_x, HIGH);
-    digitalWrite(brake_y, HIGH);
-    digitalWrite(brake_z, HIGH);
+    // // Release brakes
+    // digitalWrite(brake_x, HIGH);
+    // digitalWrite(brake_y, HIGH);
+    // digitalWrite(brake_z, HIGH);
     
-    // Disable movement
-    digitalWrite(enable_x, LOW);
-    digitalWrite(enable_y, LOW);
-    digitalWrite(enable_z, LOW);
+    // // Disable movement
+    // digitalWrite(enable_x, LOW);
+    // digitalWrite(enable_y, LOW);
+    // digitalWrite(enable_z, LOW);
     
-    attachInterrupt(FWD_BUTT, fwd_butt_handler, HIGH);
+    // attachInterrupt(FWD_BUTT, fwd_butt_handler, HIGH);
 
-    bool imu_ready = false;
-    bool imu_error_ready = false;
-    bool imu_valid = false;
-    bool imu_error_valid = false;
+    // bool imu_ready = false;
+    // bool imu_error_ready = false;
+    // bool imu_valid = false;
+    // bool imu_error_valid = false;
     
-    imu.init();
-    imu.poll(angle_values);
+    // imu.init();
+    // imu.poll(angle_values);
     
-    imu_error.init();
-    imu_error.poll(error_angle_values);
+    // imu_error.init();
+    // imu_error.poll(error_angle_values);
     
-    while(!imu_ready || !imu_error_ready){
-      delay(15); // needs small delay for init DO NOT REMOVE >:( 
-      imu_valid = false;
-      imu_error_valid = false;
-      angle_values_init[0] = angle_values[0];
-      angle_values_init[1] = angle_values[1];
-      angle_values_init[2] = angle_values[2];
+    // while(!imu_ready || !imu_error_ready){
+    //   delay(15); // needs small delay for init DO NOT REMOVE >:( 
+    //   imu_valid = false;
+    //   imu_error_valid = false;
+    //   angle_values_init[0] = angle_values[0];
+    //   angle_values_init[1] = angle_values[1];
+    //   angle_values_init[2] = angle_values[2];
      
-      error_angle_values_init[0] = error_angle_values[0];
-      error_angle_values_init[1] = error_angle_values[1];
-      error_angle_values_init[2] = error_angle_values[2];
+    //   error_angle_values_init[0] = error_angle_values[0];
+    //   error_angle_values_init[1] = error_angle_values[1];
+    //   error_angle_values_init[2] = error_angle_values[2];
       
-      imu_valid = imu.poll(angle_values);
-      imu_error_valid = imu_error.poll(error_angle_values);
+    //   imu_valid = imu.poll(angle_values);
+    //   imu_error_valid = imu_error.poll(error_angle_values);
       
-      if(imu_valid && !imu_ready){ 
-        if((abs(angle_values[0] - angle_values_init[0])<ANGLE_INIT_THRESHOLD && abs(angle_values[1] - angle_values_init[1])<ANGLE_INIT_THRESHOLD && abs(angle_values[2] - angle_values_init[2])<ANGLE_INIT_THRESHOLD)){
-          setBaseAngles(angle_values,0);
-          imu_ready = true;
-        }
-      }
+    //   if(imu_valid && !imu_ready){ 
+    //     if((abs(angle_values[0] - angle_values_init[0])<ANGLE_INIT_THRESHOLD && abs(angle_values[1] - angle_values_init[1])<ANGLE_INIT_THRESHOLD && abs(angle_values[2] - angle_values_init[2])<ANGLE_INIT_THRESHOLD)){
+    //       setBaseAngles(angle_values,0);
+    //       imu_ready = true;
+    //     }
+    //   }
       
-      if(imu_error_valid && !imu_error_ready){
-        if((abs(error_angle_values[0] - error_angle_values_init[0])<ANGLE_INIT_THRESHOLD && abs(error_angle_values[1] - error_angle_values_init[1])<ANGLE_INIT_THRESHOLD && abs(error_angle_values[2] - error_angle_values_init[2])<ANGLE_INIT_THRESHOLD)){
-          setBaseAngles(error_angle_values,1);
-          imu_error_ready = true;
-        }
-      }
-    }
+    //   if(imu_error_valid && !imu_error_ready){
+    //     if((abs(error_angle_values[0] - error_angle_values_init[0])<ANGLE_INIT_THRESHOLD && abs(error_angle_values[1] - error_angle_values_init[1])<ANGLE_INIT_THRESHOLD && abs(error_angle_values[2] - error_angle_values_init[2])<ANGLE_INIT_THRESHOLD)){
+    //       setBaseAngles(error_angle_values,1);
+    //       imu_error_ready = true;
+    //     }
+    //   }
+    // }
     
     sys_init_complete();
     
     // Enable movement
-    digitalWrite(enable_x, HIGH);
-    digitalWrite(enable_y, HIGH);
-    digitalWrite(enable_z, HIGH);
-    free(angle_values_init);
-    free(error_angle_values_init);
+    // digitalWrite(enable_x, HIGH);
+    // digitalWrite(enable_y, HIGH);
+    // digitalWrite(enable_z, HIGH);
+    // free(angle_values_init);
+    // free(error_angle_values_init);
 }
 
 
@@ -152,34 +153,41 @@ void setup() {
 // ================================================================
 
 void loop() {
-    //get angles from poll
-    base_imu_flag = imu.poll(angle_values);
-    error_imu_flag = imu_error.poll(error_angle_values);
+    if(!in_UI){
+        // //get angles from poll
+        // base_imu_flag = imu.poll(angle_values);
+        // error_imu_flag = imu_error.poll(error_angle_values);
 
-    //pid returns 3 duty cycles
-    //ignore cases where there was a fifo overflow
-    if( error_imu_flag && base_imu_flag ){
-      duty = PIDMovementCalc_withError(angle_values, error_angle_values);
+        // //pid returns 3 duty cycles
+        // //ignore cases where there was a fifo overflow
+        // if( error_imu_flag && base_imu_flag ){
+        //     duty = PIDMovementCalc_withError(angle_values, error_angle_values);
       
-     // debug
-      Serial.print(F("duty cycles: \t"));                               
-      Serial.print(duty[0]);
-      Serial.print(F("\t"));
-      Serial.print(duty[1]);
-      Serial.print(F("\t"));
-      Serial.println(duty[2]);
-      Serial.println(F(""));
+        //     // debug
+        //     Serial.print(F("duty cycles: \t"));                               
+        //     Serial.print(duty[0]);
+        //     Serial.print(F("\t"));
+        //     Serial.print(duty[1]);
+        //     Serial.print(F("\t"));
+        //     Serial.println(duty[2]);
+        //     Serial.println(F(""));
       
-      //set duty cycles
-      motorPinx.duty(duty[0]);
-      motorPiny.duty(duty[1]);
-      motorPinz.duty(duty[2]);
-      
-      free(duty);
-      //repeat
-    }
-    else{
-      Serial.println(F("Something went wrong in retreiving IMU data"));
+        //     //set duty cycles
+        //     motorPinx.duty(duty[0]);
+        //     motorPiny.duty(duty[1]);
+        //     motorPinz.duty(duty[2]);
+        
+        //     free(duty);
+        //     //repeat
+        // }
+        // else{
+        //     Serial.println(F("Something went wrong in retreiving IMU data"));
+        // }
+    
+        fwd_butt_handler();
+    }else{
+      //stop using the IMU, focus on only the LCD interface.
+      LCD_movement_handler();
     }
 }
 

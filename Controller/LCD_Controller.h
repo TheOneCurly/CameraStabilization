@@ -20,6 +20,15 @@
 #include "Arduino.h"
 #include "Variables.h"
 
+//Initialize the LCD Display
+// pin 21 - Serial clock out (SCLK)
+// pin 18 - Serial data out (SID)
+// pin 28 - LCD chip select (CS)
+// pin 32 - Data/Command select (RS or A0)
+// pin 30 - LCD reset (RST)
+static U8GLIB_LM6059_2X u8g(21, 18, 28, 32, 30);
+
+
 #define JS_X A3
 #define JS_Y A4
 #define FWD_BUTT A5
@@ -102,6 +111,7 @@ void draw_settings();
 void draw();
 
 //------------------------------ NAVIGATION FUNCTIONS -------------------------------\\
+
 void LCD_movement_handler();
 void handle_select( int command );
 void joystick_check();
