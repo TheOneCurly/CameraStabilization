@@ -38,30 +38,14 @@
     
 //home page
 #define HOME_BASE 1
-#define HOME_MAX 3
+#define HOME_MAX 2
 
-#define SYS_BASE 10
-#define SYS_MAX 11
+#define SET_BASE 80
+#define SET_MAX 81
 
 //Axis Control
 #define AXIS_SEL_BASE 20
 #define AXIS_SEL_MAX 22
-
-//X Axis Contril Menu
-#define X_CTRL_BASE 30
-#define X_CTRL_MAX 32
-#define X_ADJUST 39
-
-//Y Axis Contril Menu
-#define Y_CTRL_BASE 40
-#define Y_CTRL_MAX 42
-#define Y_ADJUST 49
-
-//Z Axis Contril Menu
-#define Z_CTRL_BASE 50
-#define Z_CTRL_MAX 51
-#define Z_ADJUST 59
-
 
 //--------------------------------- JOYSTICK VALUES ---------------------------------\\
 
@@ -73,24 +57,22 @@
 #define JS_LEFT 10
 #define JS_RIGHT 1023
 
+//---------------------------------- BUTTON VALUES ----------------------------------\\
+#define BUTT_PUSH 1000
 //---------------------------- Menu Navigation Values -------------------------------\\
 
-static int parent_menu_page;
-static int cur_menu_page, cur_menu_index = 0;
-static int next_menu_page = 0;
+static int cur_menu_page = 0;
 static int cur_selection, cur_sel_max, cur_sel_min = 0;
 
-static int adjust_val = 0;
-static int cur_axis = 0;
 static int next_move = 0;
-
 static int enable_side_scroll = 0;
 static int set_selection = 1;
 
 // System Settings Defaults 
-static int color_set = 2; //Green
-static int cursor_set = 2;
+static int color_set = 3; //Green
+static int cursor_set = 2; //Right Waka (>)
 
+static bool in_UI = false;
 
 const uint8_t paw_bitmap[] PROGMEM = {
   0x00,         // 0 0 0 0 0 0 0 0 
@@ -105,25 +87,27 @@ const uint8_t paw_bitmap[] PROGMEM = {
 
 //-----------------------------------------------------------------------------------\\
 
+//-----------------------------  LCD DISPLAY FUNCTIONS ------------------------------\\
 void initialize_LCD();
-void LCD_movement_handler();
-void sys_init_complete();
 void u8g_prepare();
-
-void draw_cursor(int cur_menu_index);
+void sys_init_complete();
+void draw_cursor( int cur_menu_index );
 void draw_init();
-void draw_home( int cur_menu_index );
 void draw_sys();
-void draw_axis_select( int cur_menu_index );
-void draw_settings( int cur_menu_index );
+void draw_home();
+void draw_axis_select();
+void draw_settings();
 void draw();
-void joystick_handler();
-void fwd_butt_handler();
-void bck_butt_handler();
 
+//------------------------------ NAVIGATION FUNCTIONS -------------------------------\\
+void LCD_movement_handler();
 void handle_select( int command );
+void joystick_check();
+void fwd_butt_check();
+void bck_butt_check();
+void fwd_butt_handler();
 
-// CONTROL FUNCTIONS
+//-------------------------- SYSTEM MANIPULATION FUNCTIONS --------------------------\\
 void unlock_axis( int axis );
 
 void set_background_color(int color);
