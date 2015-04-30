@@ -103,21 +103,21 @@ void update_sys_data(float* control, float* error){
     yError = round(error[1]);
     xError = round(error[2]);
     
-    Serial.print(F("Control: \t"));                               
-    Serial.print(xControl);
-    Serial.print(F("\t"));
-    Serial.print(yControl);
-    Serial.print(F("\t"));
-    Serial.println(zControl);
-    Serial.println(F("")); 
-    
-    Serial.print(F("Error: \t"));                               
-    Serial.print(xError);
-    Serial.print(F("\t"));
-    Serial.print(yError);
-    Serial.print(F("\t"));
-    Serial.println(zError);
-    Serial.println(F("")); 
+//    Serial.print(F("Control: \t"));                               
+//    Serial.print(xControl);
+//    Serial.print(F("\t"));
+//    Serial.print(yControl);
+//    Serial.print(F("\t"));
+//    Serial.println(zControl);
+//    Serial.println(F("")); 
+//    
+//    Serial.print(F("Error: \t"));                               
+//    Serial.print(xError);
+//    Serial.print(F("\t"));
+//    Serial.print(yError);
+//    Serial.print(F("\t"));
+//    Serial.println(zError);
+//    Serial.println(F("")); 
 
 }
 
