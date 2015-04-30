@@ -125,22 +125,22 @@ int* PIDMovementCalc_withError(float* angles, float* errorAngles){
     yErrorSum += yError*(t-t_last);
     zErrorSum += zError*(t-t_last);
     
-    Serial.print("XControl: ");
-    Serial.println(xControl);
-    Serial.print("YControl: ");
-    Serial.println(yControl);
-    Serial.print("ZControl: ");
-    Serial.println(zControl);
-    
-    Serial.print("Xerror: ");
-    Serial.println(xError);
-    Serial.print("YError: ");
-    Serial.println(yError);
-    Serial.print("ZError: ");
-    Serial.println(zError);
-    
-    Serial.print("X enabled: ");
-    Serial.println(X_control_en);
+//    Serial.print("XControl: ");
+//    Serial.println(xControl);
+//    Serial.print("YControl: ");
+//    Serial.println(yControl);
+//    Serial.print("ZControl: ");
+//    Serial.println(zControl);
+//    
+//    Serial.print("Xerror: ");
+//    Serial.println(xError);
+//    Serial.print("YError: ");
+//    Serial.println(yError);
+//    Serial.print("ZError: ");
+//    Serial.println(zError);
+//    
+//    Serial.print("X enabled: ");
+//    Serial.println(X_control_en);
     
     // X-axis
     if(X_control_en && (xControl > ANGLE_THRESHOLD || xControl < -ANGLE_THRESHOLD) && (xControl < X_MAX_ANGLE || xControl > -X_MAX_ANGLE)){

@@ -66,6 +66,8 @@ float* error_angle_values_init = (float*) calloc(3,sizeof(float));
 float* base_angles_updated = (float*) calloc(3,sizeof(float));
 float* base_error_angles_updated = (float*) calloc(3,sizeof(float));
 
+int16_t* raw_values = (int16_t*)calloc(6, sizeof(int16_t*));
+
 float yaw_start, yaw_error_start, yaw_end, yaw_error_end, yaw_drift, yaw_error_drift = 0;
 float pitch_start, pitch_error_start, pitch_end, pitch_error_end, pitch_drift, pitch_error_drift = 0;
 float roll_start, roll_error_start, roll_end, roll_error_end, roll_drift, roll_error_drift = 0;
@@ -243,40 +245,52 @@ void loop() {
         //ignore cases where there was a fifo overflow
         if( error_imu_flag && base_imu_flag ){
             end_test = millis();
-              
-            base_angles_updated[0] = base_angles_updated[0] + ((end_test-start_test)* yaw_drift);
-            base_error_angles_updated[0] = base_error_angles_updated[0]  + ((end_test-start_test)* yaw_error_drift);
-            base_angles_updated[1] = base_angles_updated[1] + ((end_test-start_test)* pitch_drift);
-            base_error_angles_updated[1] = base_error_angles_updated[1]  + ((end_test-start_test)* pitch_error_drift);
-            base_angles_updated[2] = base_angles_updated[2] + ((end_test-start_test)* roll_drift);
-            base_error_angles_updated[2] = base_error_angles_updated[2]  + ((end_test-start_test)* roll_error_drift);
-              
-            setBaseAngles(base_angles_updated,0);
-            setBaseAngles(base_error_angles_updated,1);  
             
-//            Serial.print("Base Angles Updated: \t");
-//            Serial.print(base_angles_updated[0]);
-//            Serial.print("\t");
-//            Serial.print(base_angles_updated[1]);
-//            Serial.print("\t");
-//            Serial.println(base_angles_updated[2]);
-//            Serial.print("Base Error Angles Updated: \t");
-//            Serial.print(base_error_angles_updated[0]);
-//            Serial.print("\t");
-//            Serial.print(base_error_angles_updated[1]);
-//            Serial.print("\t");
-//            Serial.println(base_error_angles_updated[2]);
+            
+            imu.getRawValues(raw_values);
+            Serial.print("accel values");
+            Serial.print("\t");
+            Serial.print(raw_values[3]);
+            Serial.print("\t");
+            Serial.print(raw_values[4]);
+            Serial.print("\t");
+            Serial.println(raw_values[5]);
+            if(abs(raw_values[3]) < 100 && abs(raw_values[4]) < 100 && abs(raw_values[5]) < 100){
+              base_angles_updated[0] = base_angles_updated[0] + ((end_test-start_test)* yaw_drift);
+              base_error_angles_updated[0] = base_error_angles_updated[0]  + ((end_test-start_test)* yaw_error_drift);
+              base_angles_updated[1] = base_angles_updated[1] + ((end_test-start_test)* pitch_drift);
+              base_error_angles_updated[1] = base_error_angles_updated[1]  + ((end_test-start_test)* pitch_error_drift);
+              base_angles_updated[2] = base_angles_updated[2] + ((end_test-start_test)* roll_drift);
+              base_error_angles_updated[2] = base_error_angles_updated[2]  + ((end_test-start_test)* roll_error_drift);
+                
+              setBaseAngles(base_angles_updated,0);
+              setBaseAngles(base_error_angles_updated,1);  
+            }
+            
+            
+            Serial.print("Base Angles Updated: \t");
+            Serial.print(base_angles_updated[0]);
+            Serial.print("\t");
+            Serial.print(base_angles_updated[1]);
+            Serial.print("\t");
+            Serial.println(base_angles_updated[2]);
+            Serial.print("Base Error Angles Updated: \t");
+            Serial.print(base_error_angles_updated[0]);
+            Serial.print("\t");
+            Serial.print(base_error_angles_updated[1]);
+            Serial.print("\t");
+            Serial.println(base_error_angles_updated[2]);
 
             duty = PIDMovementCalc_withError(angle_values, error_angle_values);
               
             // debug
-//            Serial.print(F("duty cycles: \t"));                               
-//            Serial.print(duty[0]);
-//            Serial.print(F("\t"));
-//            Serial.print(duty[1]);
-//            Serial.print(F("\t"));
-//            Serial.println(duty[2]);
-//            Serial.println(F("")); 
+            Serial.print(F("duty cycles: \t"));                               
+            Serial.print(duty[0]);
+            Serial.print(F("\t"));
+            Serial.print(duty[1]);
+            Serial.print(F("\t"));
+            Serial.println(duty[2]);
+            Serial.println(F("")); 
               
             //set duty cycles
             motorPinx.duty(duty[0]);
@@ -324,10 +338,7 @@ void loop() {
             }
         }
     }
-    UI_update_count = UI_update_count+1 ;
-    Serial.print("Count: ");
-    Serial.println(UI_update_count);
-    
+    UI_update_count = UI_update_count+1 ;   
 }
 
 

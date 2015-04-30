@@ -41,9 +41,9 @@ class IMUController{
 		float acc_scale_x, acc_scale_y, acc_scale_z;
                 float gyro_sensitivity;
                 int imu_num;
+                void getRawValues(int16_t * raw_values);
 	private:
 		void zeroGyro();
-		void getRawValues(int16_t * raw_values);
 		void getValues(float * values);
 		void getQ(float * q);
 		void getYawPitchRollRad(float * ypr);

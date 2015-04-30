@@ -173,9 +173,9 @@ void IMUController::AHRSupdate(float gx, float gy, float gz, float ax, float ay,
 		}
 
 		// Apply proportional feedback
-		gx += twoKp * halfex;
-		gy += twoKp * halfey;
-		gz += twoKp * halfez;
+		gx += 2 * twoKp * halfex;
+		gy += 2 * twoKp * halfey;
+		gz += 2 * twoKp * halfez;
 	}
 
 	// Integrate rate of change of quaternion
