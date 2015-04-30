@@ -146,7 +146,7 @@ int* PIDMovementCalc_withError(float* angles, float* errorAngles){
     if(X_control_en && (xControl > ANGLE_THRESHOLD || xControl < -ANGLE_THRESHOLD) && (xControl < X_MAX_ANGLE || xControl > -X_MAX_ANGLE)){
         xDuty = kp*xError + ki*xErrorSum;
         xDuty = constrain(xDuty, -500, 500);
-        dutyCycles[0] = map(xDuty, -500, 500, 0, 100);
+        dutyCycles[0] = map(xDuty, -500, 500, 0, +100);
     }else if(!X_control_en){
         xError = (angles[0] - baseAngles[0]) - (errorAngles[0] - errorBaseAngles[0]);
         xDuty = kp*xError;

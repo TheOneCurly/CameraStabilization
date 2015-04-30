@@ -73,6 +73,9 @@ float roll_start, roll_error_start, roll_end, roll_error_end, roll_drift, roll_e
 unsigned long start_time, end_time = 0;
 unsigned long start_test, end_test = 0;
 
+int UI_update_count = 0;
+
+
 // ================================================================
 // ===                      INITIAL SETUP                       ===
 // ================================================================
@@ -228,6 +231,7 @@ void setup() {
 // ================================================================
 
 void loop() {
+  
     if(in_UI == 0){
         //get angles from poll
         start_test = millis();
@@ -266,13 +270,13 @@ void loop() {
             duty = PIDMovementCalc_withError(angle_values, error_angle_values);
               
             // debug
-            Serial.print(F("duty cycles: \t"));                               
-            Serial.print(duty[0]);
-            Serial.print(F("\t"));
-            Serial.print(duty[1]);
-            Serial.print(F("\t"));
-            Serial.println(duty[2]);
-            Serial.println(F("")); 
+//            Serial.print(F("duty cycles: \t"));                               
+//            Serial.print(duty[0]);
+//            Serial.print(F("\t"));
+//            Serial.print(duty[1]);
+//            Serial.print(F("\t"));
+//            Serial.println(duty[2]);
+//            Serial.println(F("")); 
               
             //set duty cycles
             motorPinx.duty(duty[0]);
@@ -284,7 +288,14 @@ void loop() {
             Serial.println(F("Something went wrong in retreiving IMU data"));
         }
         
+        if(UI_update_count >= 20){
+          update_sys_data(angle_values, error_angle_values);
+          in_UI = LCD_movement_handler(1);
+          UI_update_count = 0;
+        }
+        
         in_UI = fwd_butt_handler();
+        
     }else{
         //set duty cycles
         motorPinx.duty(50);
@@ -294,6 +305,10 @@ void loop() {
         //stop using the IMU, focus on only the LCD interface.
         in_UI = LCD_movement_handler(0);
     }
+    UI_update_count = UI_update_count+1 ;
+    Serial.print("Count: ");
+    Serial.println(UI_update_count);
+    
 }
 
 

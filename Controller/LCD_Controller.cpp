@@ -22,9 +22,13 @@
 
 //------------------------------ 'BOOL' FOR INTERRUPTS ------------------------------\\
 
-static int fwd_butt_trig = 0;
 
+static int xError, yError, zError;
+static int xControl, yControl, zControl;
 
+static bool x_control = true;
+static bool y_control = true;
+static bool z_control = true;
 
 
 /*******************************************************************************
@@ -86,6 +90,37 @@ void sys_init_complete(){
     LCD_movement_handler( 1 );
 
 }
+
+void update_sys_data(float* control, float* error){
+  
+    
+  
+    xControl = round(control[0]);
+    yControl = round(control[1]);
+    zControl = round(control[2]);
+  
+    xError = round(error[0]);
+    yError = round(error[1]);
+    xError = round(error[2]);
+    
+    Serial.print(F("Control: \t"));                               
+    Serial.print(xControl);
+    Serial.print(F("\t"));
+    Serial.print(yControl);
+    Serial.print(F("\t"));
+    Serial.println(zControl);
+    Serial.println(F("")); 
+    
+    Serial.print(F("Error: \t"));                               
+    Serial.print(xError);
+    Serial.print(F("\t"));
+    Serial.print(yError);
+    Serial.print(F("\t"));
+    Serial.println(zError);
+    Serial.println(F("")); 
+
+}
+
 
 
 /*******************************************************************************
@@ -151,8 +186,8 @@ bool LCD_movement_handler(int special){
  ******************************************************************************/
 void draw_cursor( int cur_menu_index ){
     switch( cursor_set ){
-        case 1: u8g.drawStr(0, cur_menu_index*MENU_HEIGHT, ">"); break;
-        case 2: u8g.drawBitmap(0, cur_menu_index*MENU_HEIGHT, 1,  8, paw_bitmap); break;
+        case 0: u8g.drawStr(0, cur_menu_index*MENU_HEIGHT, ">"); break;
+        case 1: u8g.drawBitmap(0, cur_menu_index*MENU_HEIGHT, 1,  8, paw_bitmap); break;
     }
 }
 
@@ -185,24 +220,24 @@ void draw_sys(){
 
     //X
     u8g.drawStr(0, 2*MENU_HEIGHT, " X:" );
-    u8g.drawStr(3*MENU_INDENT, 2*MENU_HEIGHT, itoa(round(xControl), buf, 10)); 
+    u8g.drawStr(3*MENU_INDENT, 2*MENU_HEIGHT, itoa(xControl, buf, 10)); 
 
     u8g.drawStr(9*MENU_INDENT, 2*MENU_HEIGHT, "X:" );
-    u8g.drawStr(11*MENU_INDENT, 2*MENU_HEIGHT, itoa(round(xError), buf, 10));
+    u8g.drawStr(11*MENU_INDENT, 2*MENU_HEIGHT, itoa(xError, buf, 10));
 
     //Y
     u8g.drawStr(0, 3*MENU_HEIGHT, " Y:" );
-    u8g.drawStr(3*MENU_INDENT, 3*MENU_HEIGHT, itoa(round(yControl), buf, 10)); 
+    u8g.drawStr(3*MENU_INDENT, 3*MENU_HEIGHT, itoa(yControl, buf, 10)); 
 
     u8g.drawStr(9*MENU_INDENT, 3*MENU_HEIGHT, "Y:" );
-    u8g.drawStr(11*MENU_INDENT, 3*MENU_HEIGHT, itoa(round(yError), buf, 10)); 
+    u8g.drawStr(11*MENU_INDENT, 3*MENU_HEIGHT, itoa(yError, buf, 10)); 
 
     //Z
     u8g.drawStr(0, 4*MENU_HEIGHT, " Z:" );
-    u8g.drawStr(3*MENU_INDENT, 4*MENU_HEIGHT, itoa(round(zControl), buf, 10)); 
+    u8g.drawStr(3*MENU_INDENT, 4*MENU_HEIGHT, itoa(zControl, buf, 10)); 
 
     u8g.drawStr(9*MENU_INDENT, 4*MENU_HEIGHT, "Z:" );
-    u8g.drawStr(11*MENU_INDENT, 4*MENU_HEIGHT, itoa(round(zError), buf, 10)); 
+    u8g.drawStr(11*MENU_INDENT, 4*MENU_HEIGHT, itoa(zError, buf, 10)); 
     
     u8g.drawStr(0, 6*MENU_HEIGHT, "PRESS FWD TO ENTER UI");
 }
@@ -242,21 +277,21 @@ void draw_axis_select(){
     u8g.drawStr(0, MENU_HEIGHT, "NOTE:");
     u8g.drawStr(MENU_INDENT, 2*MENU_HEIGHT, "  Lock is Stabilized");
 
-    if(X_control_en){ //true = stabilized = lock
+    if(x_control){ //true = stabilized = lock
         u8g.drawStr(MENU_INDENT, 3*MENU_HEIGHT, "Unlock X Axis (Pan)");
     }else{
         u8g.drawStr(MENU_INDENT, 3*MENU_HEIGHT, "Lock X Axis (Pan)");
     }
 
 
-    if(Y_control_en){ //true = stabilized = lock
+    if(y_control){ //true = stabilized = lock
         u8g.drawStr(MENU_INDENT, 4*MENU_HEIGHT, "Unlock Y Axis (Tilt)");
     }else{
         u8g.drawStr(MENU_INDENT, 4*MENU_HEIGHT, "Lock Y Axis (Tilt)");
     }
 
 
-    if(Z_control_en){ //true = stabilized = lock
+    if(z_control){ //true = stabilized = lock
         u8g.drawStr(MENU_INDENT, 5*MENU_HEIGHT, "Unlock Z Axis (Pitch)");
     }else{
         u8g.drawStr(MENU_INDENT, 5*MENU_HEIGHT, "Lock Z Axis (Pitch)");
@@ -279,20 +314,20 @@ void draw_settings(){
     //Determine which color option to display.
     if ( cur_selection == 80 ){
         switch( (set_selection % 5)){
-            case 1: u8g.drawStr(MENU_INDENT, 4*MENU_HEIGHT, "Color [ Blue   ]"); break;
-            case 2: u8g.drawStr(MENU_INDENT, 4*MENU_HEIGHT, "Color [ Green  ]"); break;
-            case 3: u8g.drawStr(MENU_INDENT, 4*MENU_HEIGHT, "Color [ Red    ]"); break;
-            case 4: u8g.drawStr(MENU_INDENT, 4*MENU_HEIGHT, "Color [ Purple ]"); break;
-            case 5: u8g.drawStr(MENU_INDENT, 4*MENU_HEIGHT, "Color [ Off    ]"); break;
+            case 0: u8g.drawStr(MENU_INDENT, 4*MENU_HEIGHT, "Color [ Blue   ]"); break;
+            case 1: u8g.drawStr(MENU_INDENT, 4*MENU_HEIGHT, "Color [ Green  ]"); break;
+            case 2: u8g.drawStr(MENU_INDENT, 4*MENU_HEIGHT, "Color [ Red    ]"); break;
+            case 3: u8g.drawStr(MENU_INDENT, 4*MENU_HEIGHT, "Color [ Purple ]"); break;
+            case 4: u8g.drawStr(MENU_INDENT, 4*MENU_HEIGHT, "Color [ Off    ]"); break;
 
         }
     }else{
         switch( color_set ){
-            case 1: u8g.drawStr(MENU_INDENT, 4*MENU_HEIGHT, "Color [ Blue   ]"); break;
-            case 2: u8g.drawStr(MENU_INDENT, 4*MENU_HEIGHT, "Color [ Green  ]"); break;
-            case 3: u8g.drawStr(MENU_INDENT, 4*MENU_HEIGHT, "Color [ Red    ]"); break;
-            case 4: u8g.drawStr(MENU_INDENT, 4*MENU_HEIGHT, "Color [ Purple ]"); break;
-            case 5: u8g.drawStr(MENU_INDENT, 4*MENU_HEIGHT, "Color [ Off    ]"); break;
+            case 0: u8g.drawStr(MENU_INDENT, 4*MENU_HEIGHT, "Color [ Blue   ]"); break;
+            case 1: u8g.drawStr(MENU_INDENT, 4*MENU_HEIGHT, "Color [ Green  ]"); break;
+            case 2: u8g.drawStr(MENU_INDENT, 4*MENU_HEIGHT, "Color [ Red    ]"); break;
+            case 3: u8g.drawStr(MENU_INDENT, 4*MENU_HEIGHT, "Color [ Purple ]"); break;
+            case 4: u8g.drawStr(MENU_INDENT, 4*MENU_HEIGHT, "Color [ Off    ]"); break;
 
         }
     }
@@ -300,15 +335,15 @@ void draw_settings(){
     //Determine which cursor option to display.
     if ( cur_selection == 81 ){
         switch( (set_selection % 2)){
-            case 1: u8g.drawStr(MENU_INDENT, 5*MENU_HEIGHT, "Cursor  [   >  ]"); break;
-            case 2: u8g.drawStr(MENU_INDENT, 5*MENU_HEIGHT, "Cursor  [      ]");
+            case 0: u8g.drawStr(MENU_INDENT, 5*MENU_HEIGHT, "Cursor  [   >  ]"); break;
+            case 1: u8g.drawStr(MENU_INDENT, 5*MENU_HEIGHT, "Cursor  [      ]");
                     u8g.drawBitmap( 9*MENU_INDENT, 5*MENU_HEIGHT, 1, 8, paw_bitmap);
                     break;
         }
     }else{
         switch( cursor_set ){
-            case 1: u8g.drawStr(MENU_INDENT, 5*MENU_HEIGHT, "Cursor  [   >  ]"); break;
-            case 2: u8g.drawStr(MENU_INDENT, 5*MENU_HEIGHT, "Cursor  [      ]"); 
+            case 0: u8g.drawStr(MENU_INDENT, 5*MENU_HEIGHT, "Cursor  [   >  ]"); break;
+            case 1: u8g.drawStr(MENU_INDENT, 5*MENU_HEIGHT, "Cursor  [      ]"); 
                     u8g.drawBitmap( 9*MENU_INDENT, 5*MENU_HEIGHT, 1, 8, paw_bitmap);
                     break;
         }
@@ -528,31 +563,31 @@ void set_background_color( int color ){
   //--- (ie. if you want green set blue and red high, and green low.
     switch( color ){
       //--------------------  BLUE  --------------------------//
-      case 1: digitalWrite(BACKLIGHT_LED, HIGH);
+      case 0: digitalWrite(BACKLIGHT_LED, HIGH);
               digitalWrite(BLUE_LED, LOW); //Blue
               digitalWrite(GREEN_LED, HIGH); //Green
               digitalWrite(RED_LED, HIGH); //Red
               break;
       //-------------------- GREEN --------------------------//
-      case 2: digitalWrite(BACKLIGHT_LED, HIGH);
+      case 1: digitalWrite(BACKLIGHT_LED, HIGH);
               digitalWrite(BLUE_LED, HIGH); //Blue
               digitalWrite(GREEN_LED, LOW); //Green
               digitalWrite(RED_LED, HIGH); //Red
               break;
       //--------------------  RED  --------------------------//
-      case 3: digitalWrite(BACKLIGHT_LED, HIGH);
+      case 2: digitalWrite(BACKLIGHT_LED, HIGH);
               digitalWrite(BLUE_LED, HIGH); //Blue
               digitalWrite(GREEN_LED, HIGH); //Green
               digitalWrite(RED_LED, LOW); //Red
               break;
       //------------------- PURPLE -------------------------//
-      case 4: digitalWrite(BACKLIGHT_LED, HIGH);
+      case 3: digitalWrite(BACKLIGHT_LED, HIGH);
               digitalWrite(BLUE_LED, LOW); //Blue
               digitalWrite(GREEN_LED, HIGH); //Green
               digitalWrite(RED_LED, LOW); //Red
               break;
       //-------------------- OFF --------------------------//
-      case 5: digitalWrite(BACKLIGHT_LED, HIGH);
+      case 4: digitalWrite(BACKLIGHT_LED, HIGH);
               digitalWrite(BLUE_LED, HIGH); //Blue
               digitalWrite(GREEN_LED, HIGH); //Green
               digitalWrite(RED_LED, HIGH); //Red
@@ -578,11 +613,11 @@ void set_background_color( int color ){
  ******************************************************************************/
 void unlock_axis( int axis ){
     switch(axis){
-        case 1: X_control_en = !X_control_en;
+        case 1: x_control = !x_control;
                 break;
-        case 2: Y_control_en = !Y_control_en;
+        case 2: y_control = !y_control;
                 break;
-        case 3: Z_control_en = !Z_control_en;
+        case 3: z_control = !z_control;
                 break;
     }
 }

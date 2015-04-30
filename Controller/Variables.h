@@ -19,7 +19,7 @@
 	//	True means the axis is stabilized
 	//	False means the axis is free floating. 
 	static bool X_control_en = true;
-	static bool Y_control_en = true;
+        static bool Y_control_en = true;
 	static bool Z_control_en = true;
 
 	static float xError, yError, zError;

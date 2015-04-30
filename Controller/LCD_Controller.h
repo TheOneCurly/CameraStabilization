@@ -14,11 +14,12 @@
  */
 
 #ifndef _H_LCD_CONTROLLER_H_
+
 #define _H_LCD_CONTROLLER_H_
 
 #include <U8glib.h>
 #include "Arduino.h"
-#include "Variables.h"
+//#include "Variables.h"
 
 //Initialize the LCD Display
 // pin 21 - Serial clock out (SCLK)
@@ -26,7 +27,7 @@
 // pin 28 - LCD chip select (CS)
 // pin 32 - Data/Command select (RS or A0)
 // pin 30 - LCD reset (RST)
-static U8GLIB_LM6059_2X u8g(21, 18, 28, 32, 30);
+static U8GLIB_LM6059_2X u8g(70, 18, 28, 32, 30);
 
 
 #define JS_X A3
@@ -79,8 +80,10 @@ static int enable_side_scroll = 0;
 static int set_selection = 1;
 
 // System Settings Defaults 
-static int color_set = 2; //Green
-static int cursor_set = 2; //Right Waka (>)
+static int color_set = 1; //Green
+static int cursor_set = 1; //Paw Print
+
+
 
 
 
@@ -102,6 +105,7 @@ const uint8_t paw_bitmap[] PROGMEM = {
 void initialize_LCD();
 void u8g_prepare();
 void sys_init_complete();
+void update_sys_data(float* control, float* error);
 void draw_cursor( int cur_menu_index );
 void draw_init();
 void draw_sys();
