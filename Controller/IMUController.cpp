@@ -38,7 +38,6 @@ bool IMUController::init(){
 	lastUpdate = 0;
 	now = 0;
 	
-        Wire.begin();
 	// get values from global variables of same name defined in calibration.h
 	acc_off_x = ::acc_off_x;
 	acc_off_y = ::acc_off_y;
@@ -274,13 +273,13 @@ bool IMUController::poll(float* angle_values){
     angle_values[1] = angle_values[1]/10;
     angle_values[2] = angle_values[2]/10;
     
-    Serial.print(imu_num);
-    Serial.print(F("\t angles \t"));
-    Serial.print(angle_values[0]);
-    Serial.print(F("\t"));
-    Serial.print(angle_values[1]);
-    Serial.print(F("\t"));
-    Serial.println(angle_values[2]);
+//    Serial.print(imu_num);
+//    Serial.print(F("\t angles \t"));
+//    Serial.print(angle_values[0]);
+//    Serial.print(F("\t"));
+//    Serial.print(angle_values[1]);
+//    Serial.print(F("\t"));
+//    Serial.println(angle_values[2]);
 	
     if (angle_values)
 	return true;

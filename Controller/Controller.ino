@@ -82,6 +82,7 @@ void setup() {
     Serial.begin(9600);
     
     initialize_LCD();
+    Wire.begin();
     
     // Set pin modes
     pinMode(brake_x, OUTPUT);
@@ -165,11 +166,15 @@ void setup() {
     imu_error.poll(error_angle_values);
     
     // Set Base Angles
-    base_angles_updated = angle_values;
-    base_error_angles_updated = error_angle_values;
+    base_angles_updated[0] = angle_values[0];
+    base_angles_updated[1] = angle_values[1];
+    base_angles_updated[2] = angle_values[2];
+    base_error_angles_updated[0] = error_angle_values[0];
+    base_error_angles_updated[1] = error_angle_values[1];
+    base_error_angles_updated[2] = error_angle_values[2];
     
-    setBaseAngles(base_angles_updated,0);
-    setBaseAngles(base_error_angles_updated,1);
+    setBaseAngles(angle_values,0);
+    setBaseAngles(error_angle_values,1);
     
     start_time = millis();
     
@@ -191,20 +196,20 @@ void setup() {
     
     end_time = millis();
     
-//    Serial.print("Time = ");
-//    Serial.println(end_time - start_time);
-//    Serial.print(" Yaw Drift Amounts ");
-//    Serial.print(yaw_drift);
-//    Serial.print(" \t");
-//    Serial.println(yaw_error_drift);   
-//    Serial.print(" Pitch Drift Amounts ");
-//    Serial.print(pitch_drift);
-//    Serial.print(" \t");
-//    Serial.println(pitch_error_drift);   
-//    Serial.print(" Roll Drift Amounts ");
-//    Serial.print(roll_drift);
-//    Serial.print(" \t");
-//    Serial.println(roll_error_drift);
+    Serial.print("Time = ");
+    Serial.println(end_time - start_time);
+    Serial.print(" Yaw Drift Amounts ");
+    Serial.print(yaw_drift);
+    Serial.print(" \t");
+    Serial.println(yaw_error_drift);   
+    Serial.print(" Pitch Drift Amounts ");
+    Serial.print(pitch_drift);
+    Serial.print(" \t");
+    Serial.println(pitch_error_drift);   
+    Serial.print(" Roll Drift Amounts ");
+    Serial.print(roll_drift);
+    Serial.print(" \t");
+    Serial.println(roll_error_drift);
 
     sys_init_complete();
     
@@ -233,23 +238,6 @@ void loop() {
         //pid returns 3 duty cycles
         //ignore cases where there was a fifo overflow
         if( error_imu_flag && base_imu_flag ){
-            duty = PIDMovementCalc_withError(angle_values, error_angle_values);
-              
-            // debug
-//            Serial.print(F("duty cycles: \t"));                               
-//            Serial.print(duty[0]);
-//            Serial.print(F("\t"));
-//            Serial.print(duty[1]);
-//            Serial.print(F("\t"));
-//            Serial.println(duty[2]);
-//            Serial.println(F("")); 
-              
-            //set duty cycles
-            motorPinx.duty(duty[0]);
-            motorPiny.duty(duty[1]);
-            motorPinz.duty(duty[2]);
-            free(duty);
-              
             end_test = millis();
               
             base_angles_updated[0] = base_angles_updated[0] + ((end_test-start_test)* yaw_drift);
@@ -259,18 +247,38 @@ void loop() {
             base_angles_updated[2] = base_angles_updated[2] + ((end_test-start_test)* roll_drift);
             base_error_angles_updated[2] = base_error_angles_updated[2]  + ((end_test-start_test)* roll_error_drift);
               
-            Serial.print("Base Angles Updated: \t");
-            Serial.print(base_angles_updated[0]);
-            Serial.print("\t");
-            Serial.print(base_angles_updated[1]);
-            Serial.print("\t");
-            Serial.println(base_angles_updated[2]);
-            Serial.print("Base Error Angles Updated: \t");
-            Serial.print(base_error_angles_updated[0]);
-            Serial.print("\t");
-            Serial.print(base_error_angles_updated[1]);
-            Serial.print("\t");
-            Serial.println(base_error_angles_updated[2]);
+            setBaseAngles(base_angles_updated,0);
+            setBaseAngles(base_error_angles_updated,1);  
+            
+//            Serial.print("Base Angles Updated: \t");
+//            Serial.print(base_angles_updated[0]);
+//            Serial.print("\t");
+//            Serial.print(base_angles_updated[1]);
+//            Serial.print("\t");
+//            Serial.println(base_angles_updated[2]);
+//            Serial.print("Base Error Angles Updated: \t");
+//            Serial.print(base_error_angles_updated[0]);
+//            Serial.print("\t");
+//            Serial.print(base_error_angles_updated[1]);
+//            Serial.print("\t");
+//            Serial.println(base_error_angles_updated[2]);
+
+            duty = PIDMovementCalc_withError(angle_values, error_angle_values);
+              
+            // debug
+            Serial.print(F("duty cycles: \t"));                               
+            Serial.print(duty[0]);
+            Serial.print(F("\t"));
+            Serial.print(duty[1]);
+            Serial.print(F("\t"));
+            Serial.println(duty[2]);
+            Serial.println(F("")); 
+              
+            //set duty cycles
+            motorPinx.duty(duty[0]);
+            motorPiny.duty(50);
+            motorPinz.duty(50);
+            free(duty);
           
         }else{
             Serial.println(F("Something went wrong in retreiving IMU data"));
