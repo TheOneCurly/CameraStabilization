@@ -108,13 +108,13 @@ int* PIDMovementCalc(float* angles){
  *
  *
  ******************************************************************************/
-int* PIDMovementCalc_withError(float* angles, float* errorAngles){
+int* PIDMovementCalc_withError(float* errorAngles, float* angles){
     int* dutyCycles = (int*)malloc(3*sizeof(int));
     t = millis()/1000;
     
     // Main IMU error
-    xControl = (angles[1] - baseAngles[1]);
-    yControl = (angles[2] - baseAngles[2]);
+    xControl = (angles[2] - baseAngles[2]);
+    yControl = (angles[1] - baseAngles[1]);
     zControl = (angles[0] - baseAngles[0]);
     
     // Error IMU error
@@ -149,44 +149,44 @@ int* PIDMovementCalc_withError(float* angles, float* errorAngles){
         Serial.print("Xduty: ");
         Serial.println(xDuty);
         xDuty = constrain(xDuty, -DUTY_CONSTRAIN, DUTY_CONSTRAIN);
-        dutyCycles[0] = map(xDuty, -DUTY_CONSTRAIN, DUTY_CONSTRAIN, 0, +100);
+        dutyCycles[0] = map(xDuty, -DUTY_CONSTRAIN, DUTY_CONSTRAIN, 25, 75);
     }else if(!X_control_en){
         xError = (angles[0] - baseAngles[0]) - (errorAngles[0] - errorBaseAngles[0]);
         xDuty = kp*xError;
         xDuty = constrain(xDuty, -DUTY_CONSTRAIN, DUTY_CONSTRAIN);
-        dutyCycles[0] = map(xDuty, -DUTY_CONSTRAIN, DUTY_CONSTRAIN, 0, 100);
+        dutyCycles[0] = map(xDuty, -DUTY_CONSTRAIN, DUTY_CONSTRAIN, 25, 75);
     }else{
         dutyCycles[0] = 50;
     }
     
     // Y-axis
     if(Y_control_en && (yControl > ANGLE_THRESHOLD || yControl < -ANGLE_THRESHOLD) && (yControl < Y_MAX_ANGLE || yControl > -Y_MAX_ANGLE)){
-        yDuty = kp*yError+ ki*yErrorSum;
+        yDuty = -1*(kp*yError+ ki*yErrorSum);
         Serial.print("Yduty: ");
         Serial.println(yDuty);
         yDuty = constrain(yDuty, -DUTY_CONSTRAIN, DUTY_CONSTRAIN);
-        dutyCycles[1] = map(yDuty, -DUTY_CONSTRAIN, DUTY_CONSTRAIN, 0, 100);
+        dutyCycles[1] = map(yDuty, -DUTY_CONSTRAIN, DUTY_CONSTRAIN, 25, 75);
     }else if(!Y_control_en){
-        yError = (angles[1] - baseAngles[1]) - (errorAngles[1] - errorBaseAngles[1]);
+        yError = -1*(angles[1] - baseAngles[1]) - (errorAngles[1] - errorBaseAngles[1]);
         yDuty = kp*yError;
         yDuty = constrain(yDuty, -DUTY_CONSTRAIN, DUTY_CONSTRAIN);
-        dutyCycles[1] = map(yDuty, -DUTY_CONSTRAIN, DUTY_CONSTRAIN, 0, 100);
+        dutyCycles[1] = map(yDuty, -DUTY_CONSTRAIN, DUTY_CONSTRAIN, 25, 75);
     }else{
         dutyCycles[1] = 50;
     }
     
     // Z-axis
     if(Z_control_en && (zControl > ANGLE_THRESHOLD || zControl < -ANGLE_THRESHOLD) && (zControl < Z_MAX_ANGLE || zControl > -Z_MAX_ANGLE)){
-        zDuty = kp*zError+ ki*zErrorSum;
+        zDuty = -1*(kp*zError+ ki*zErrorSum);
         Serial.print("Zduty: ");
         Serial.println(zDuty);
         zDuty = constrain(zDuty, -DUTY_CONSTRAIN, DUTY_CONSTRAIN);
-        dutyCycles[2] = map(zDuty, -DUTY_CONSTRAIN, DUTY_CONSTRAIN, 0, 100);
+        dutyCycles[2] = map(zDuty, -DUTY_CONSTRAIN, DUTY_CONSTRAIN, 25, 75);
     }else if(!Z_control_en){
-        zError = (angles[2] - baseAngles[2]) - (errorAngles[2] - errorBaseAngles[2]);
+        zError = -1*(angles[2] - baseAngles[2]) - (errorAngles[2] - errorBaseAngles[2]);
         zDuty = kp*zError;
         zDuty = constrain(zDuty, -DUTY_CONSTRAIN, DUTY_CONSTRAIN);
-        dutyCycles[2] = map(zDuty, -DUTY_CONSTRAIN, DUTY_CONSTRAIN, 0, 100);
+        dutyCycles[2] = map(zDuty, -DUTY_CONSTRAIN, DUTY_CONSTRAIN, 25, 75);
     }else{
         dutyCycles[2] = 50;
     }

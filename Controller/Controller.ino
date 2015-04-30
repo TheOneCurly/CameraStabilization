@@ -255,7 +255,7 @@ void loop() {
             Serial.print(raw_values[4]);
             Serial.print("\t");
             Serial.println(raw_values[5]);
-            if(abs(raw_values[3]) < 100 && abs(raw_values[4]) < 100 && abs(raw_values[5]) < 100){
+            //if(abs(raw_values[3]) < 100 && abs(raw_values[4]) < 100 && abs(raw_values[5]) < 100){
               base_angles_updated[0] = base_angles_updated[0] + ((end_test-start_test)* yaw_drift);
               base_error_angles_updated[0] = base_error_angles_updated[0]  + ((end_test-start_test)* yaw_error_drift);
               base_angles_updated[1] = base_angles_updated[1] + ((end_test-start_test)* pitch_drift);
@@ -265,7 +265,7 @@ void loop() {
                 
               setBaseAngles(base_angles_updated,0);
               setBaseAngles(base_error_angles_updated,1);  
-            }
+            //}
             
             
             Serial.print("Base Angles Updated: \t");
