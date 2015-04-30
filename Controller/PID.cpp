@@ -253,7 +253,7 @@ static bool AdjustPerformance(int adjustValue){
  *
  *
  ******************************************************************************/
-static bool holdXAxis(){
+bool holdXAxis(){
 
 	X_control_en = true;
 
@@ -270,7 +270,7 @@ static bool holdXAxis(){
  *
  *
  ******************************************************************************/
-static bool holdYAxis(){
+bool holdYAxis(){
 
 	Y_control_en = true;
 
@@ -287,7 +287,7 @@ static bool holdYAxis(){
  *
  *
  ******************************************************************************/
-static bool holdZAxis(){
+bool holdZAxis(){
 
 	Z_control_en = true;
 
@@ -306,7 +306,7 @@ static bool holdZAxis(){
  *
  *
  ******************************************************************************/
-static bool freeXAxis(){
+bool freeXAxis(){
 
 	X_control_en = false;
 
@@ -324,7 +324,7 @@ static bool freeXAxis(){
  *
  *
  ******************************************************************************/
-static bool freeYAxis(){
+bool freeYAxis(){
 
 	Y_control_en = false;
 
@@ -341,7 +341,7 @@ static bool freeYAxis(){
  *
  *
  ******************************************************************************/
-static bool freeZAxis(){
+bool freeZAxis(){
 
 	Z_control_en = false;
 

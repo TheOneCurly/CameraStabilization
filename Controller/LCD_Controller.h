@@ -126,7 +126,7 @@ bool fwd_butt_handler();
 //-------------------------- SYSTEM MANIPULATION FUNCTIONS --------------------------\\
 
 void unlock_axis( int axis );
-
+bool getLockStatus(int axis);
 void set_background_color(int color);
 
 #endif

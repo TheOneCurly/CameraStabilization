@@ -280,8 +280,8 @@ void loop() {
               
             //set duty cycles
             motorPinx.duty(duty[0]);
-            motorPiny.duty(50);
-            motorPinz.duty(50);
+            motorPiny.duty(duty[1]);
+            motorPinz.duty(duty[2]);
             free(duty);
           
         }else{
@@ -304,6 +304,25 @@ void loop() {
         
         //stop using the IMU, focus on only the LCD interface.
         in_UI = LCD_movement_handler(0);
+        if(!in_UI){
+            if(getLockStatus(1)){
+                holdXAxis();
+            }else{
+                freeXAxis();
+            }
+            
+            if(getLockStatus(2)){
+                holdYAxis();
+            }else{
+                freeYAxis();
+            }
+            
+            if(getLockStatus(3)){
+                holdZAxis(); 
+            }else{
+                freeZAxis();
+            }
+        }
     }
     UI_update_count = UI_update_count+1 ;
     Serial.print("Count: ");

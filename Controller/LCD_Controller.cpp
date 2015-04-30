@@ -622,5 +622,10 @@ void unlock_axis( int axis ){
     }
 }
 
-
-
+bool getLockStatus(int axis){
+    switch(axis){
+      case 1: return x_control;
+      case 2: return y_control;
+      case 3: return z_control;
+      }
+}
