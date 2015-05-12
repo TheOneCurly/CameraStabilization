@@ -32,13 +32,14 @@
     static bool AdjustPerformance(int adjustValue);
 
     //Update controller based on user set inputs (hold axis/float axis/etc.)
-    static bool holdXAxis();
-    static bool holdYAxis();
-    static bool holdZAxis();
+    
+    bool holdXAxis();
+    bool holdYAxis();
+    bool holdZAxis();
 
-    static bool freeXAxis();
-    static bool freeYAxis();
-    static bool freeZAxis();
+    bool freeXAxis();
+    bool freeYAxis();
+    bool freeZAxis();
     
     void setBaseAngles(float*, int);
 

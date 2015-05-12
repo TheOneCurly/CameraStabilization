@@ -1,3 +1,5 @@
+#include <Wire.h>
+
 /*============================================================================================
 
 
@@ -12,35 +14,54 @@
 #ifndef _IMU_CONTROL_H_
 #define _IMU_CONTROL_H_
 
-#include "MPU6050_6Axis_MotionApps20.h"
+//#include "MPU6050_6Axis_MotionApps20.h"
+#include "Arduino.h"
+#include "calibration.h"
+//#include <EEPROM.h>
 
+#include "I2Cdev.h"
+#include "MPU6050.h"
+
+#define twoKpDef  (2.0f * 0.5f) // 2 * proportional gain
+#define twoKiDef  (2.0f * 0.1f) // 2 * integral gain
+
+#ifndef cbi
+#define cbi(sfr, bit) (_SFR_BYTE(sfr) &= ~_BV(bit))
+#endif
 
 class IMUController{
     public:
-        IMUController(int);
-        bool init();
-        bool poll(float*);
-        MPU6050* getIMU();
-        volatile bool mpuInterrupt = false;     // indicates whether MPU interrupt pin has gone high
-        
-    private:
-    uint8_t devStatus;      // return status after each device operation (0 = success, !0 = error)
-    uint8_t mpuIntStatus;   // holds actual interrupt status byte from MPU
-    uint16_t packetSize;    // expected DMP packet size (default is 42 bytes)
-    bool dmpReady = false;  // set true if DMP init was successful
-    uint16_t fifoCount;     // count of all bytes currently in FIFO
-    uint8_t fifoBuffer[64]; // FIFO storage buffer
-    
-    // orientation/motion vars
-    Quaternion q;           // [w, x, y, z]         quaternion container
-    VectorFloat gravity;    // [x, y, z]            gravity vector
-    float ypr[3];           // [yaw, pitch, roll]   yaw/pitch/roll container and gravity vector
-    
-    float ypr_avg[3];
-    int ypr_count = 0;
-    int interruptNum;
-    MPU6050 mpu;
-    
+		IMUController(int);
+		bool init();
+		bool poll(float*);
+                void calLoad();
+		int16_t* raw_acc, raw_gyro;
+		int16_t gyro_off_x, gyro_off_y, gyro_off_z;
+		int16_t acc_off_x, acc_off_y, acc_off_z;
+		float acc_scale_x, acc_scale_y, acc_scale_z;
+                float gyro_sensitivity;
+                int imu_num;
+                void getRawValues(int16_t * raw_values);
+	private:
+		void zeroGyro();
+		void getValues(float * values);
+		void getQ(float * q);
+		void getYawPitchRollRad(float * ypr);
+		void getYawPitchRoll(float * ypr);
+		void gravityCompensateAcc(float * acc, float * q);
+		void AHRSupdate(float gx, float gy, float gz, float ax, float ay, float az);
+		MPU6050 mpu;
+		float iq0, iq1, iq2, iq3;
+		float exInt, eyInt, ezInt;  // scaled integral error
+		volatile float twoKp;      // 2 * proportional gain (Kp)
+		volatile float twoKi;      // 2 * integral gain (Ki)
+		volatile float q0, q1, q2, q3; // quaternion of sensor frame relative to auxiliary frame
+		volatile float integralFBx,  integralFBy, integralFBz;
+		unsigned long lastUpdate, now; // sample period expressed in milliseconds
+		float sampleFreq; // half the sample period expressed in seconds
 };
+
+float invSqrt(float number);
+void arr3_rad_to_deg(float * arr);
 #endif /* _IMU_CONTROL_H_ */
 
