@@ -1,2 +1,19 @@
-KEEP THE REPO CLEAN! AND WORKING!
-OK
+Created as a senior capstone project for the Rochester Institute of Technology Department of Computer Engineering.
+Authors: Marit Brocker, Mitchell Cook, Caleb Disbrow, Alex Wilson
+
+Hardware:
+  Arduino Due
+  MPU-6050 (GY-521 breakout)
+  STMicro L6235 3-Phase brushless motor controller
+  Turnigy 5208 Gimbal Motor
+  ST-765 LCD
+  Pololu Step-up regulators (9V and 12V)
+  Venom 7.4V 10,000mAh 25C Li-Po battery
+
+Libraries:
+  UG8lib http://code.google.com/p/u8glib/
+  I2C Device Library https://github.com/jrowberg/i2cdevlib
+  Custom PWM Frequencies https://bitbucket.org/DeepHorizons/arduino-due-custom-pwm
+
+Usage:
+  Set output pins in Controller/Controller.ino
